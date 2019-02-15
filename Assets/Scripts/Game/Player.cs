@@ -17,16 +17,21 @@ public class Player : MonoBehaviour
         int index = playerCells.IndexOf(cell) - 1;
         return (index >= 0)? playerCells[index]:null;
     }
+
     //системные характеристики
     KeyCode[] key;
     private Button btnAdd;
     private Button btnRem;
+    private Text textPoints;
 
     //характеристики поезда
     float speed;
     public Vector2 velocity;
     bool move;
     Color myColor;
+
+    //
+    public bool connectIf;
 
     //статистика поезда
     public float score;
@@ -39,11 +44,13 @@ public class Player : MonoBehaviour
         StartVelocity(i,j);
     }
 
-    public void StartEngine(KeyCode[] key, Button btnAdd, Button btnRem)
+    public void StartEngine(KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
     {
+        textPoints.gameObject.SetActive(true);
         ButtonActivate(btnAdd, btnRem);
         this.key = key;
-        
+        this.textPoints = textPoints;
+
         transform.SetAsLastSibling();
         playerHead.NextCell(velocity);
         move = true;
@@ -55,7 +62,10 @@ public class Player : MonoBehaviour
         {
             Controll();
             MovePlayer();
-            btnAdd.interactable = playerHead.CheckArrive(velocity);
+            connectIf = playerHead.CheckArrive(velocity);
+
+            btnAdd.interactable = connectIf;
+            textPoints.text = score.ToString();
         }
     }
 
@@ -70,14 +80,25 @@ public class Player : MonoBehaviour
         StartCoroutine(ConnectAnimation());
     }
 
+    public void Disconnect()
+    {
+        if (playerCells.Count > 1)
+        {
+            playerCells[1].Disconnect();
+            playerCells.Remove(playerCells[1]);
+        }
+    }
+
     IEnumerator ConnectAnimation()
     {
+        move = false;
         btnAdd.GetComponent<Image>().fillAmount = 0;
-        while (btnAdd.GetComponent<Image>().fillAmount <= 0.95f)
+        while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
             btnAdd.GetComponent<Image>().fillAmount += 0.01f;
             yield return new WaitForEndOfFrame();
         }
+        move = true;
         playerCells.Add(playerHead.Connect(velocity));
     }
 
@@ -89,7 +110,7 @@ public class Player : MonoBehaviour
         this.btnRem = btnRem;
         this.btnRem.onClick.RemoveAllListeners();
         this.btnAdd.onClick.RemoveAllListeners();
-        this.btnRem.onClick.AddListener(() => Connect());
+        this.btnRem.onClick.AddListener(() => Disconnect());
         this.btnAdd.onClick.AddListener(() => Connect());
     }
 
@@ -142,9 +163,13 @@ public class Player : MonoBehaviour
             if (velocity != new Vector2(0, -1))
                 velocity = new Vector2(0, 1);
         }
-        if (Input.GetKeyDown(key[4]))
+        if (Input.GetKeyDown(key[4]) && connectIf)
         {
             Connect();
+        }
+        if (Input.GetKeyDown(key[5]))
+        {
+            Disconnect();
         }
     }
 }

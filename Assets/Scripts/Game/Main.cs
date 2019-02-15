@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class Main : MonoBehaviour {
     public static Main instance;
-    
+
+    public string[] resultWords;
     public CellGame[,] cells = new CellGame[DataGame.x, DataGame.y];
     public Transform parent;
     public Vector2 sizeBtn;
@@ -13,6 +14,7 @@ public class Main : MonoBehaviour {
     public List<Player> players = new List<Player>();
     public Button[] btnsAdd;
     public Button[] btnsRem;
+    public Text[] textsPoint;
 
     private void Awake()
     {
@@ -22,6 +24,7 @@ public class Main : MonoBehaviour {
 
     private void CreateMap()
     {
+        resultWords = PlayerPrefs.GetString("words").Split(' ', '\n');
         string m = PlayerPrefs.GetString("map");
         string[] map = m.Split(' ');
         ScaleParent();
@@ -40,8 +43,8 @@ public class Main : MonoBehaviour {
             }
         for (int i = 0; i < players.Count; i++)
         {
-            KeyCode[] control = new KeyCode[5] { DataGame.key[i, 0], DataGame.key[i, 1], DataGame.key[i, 2], DataGame.key[i, 3], DataGame.key[i, 4] };
-            players[i].StartEngine(control, btnsAdd[i], btnsRem[i]);
+            KeyCode[] control = new KeyCode[6] { DataGame.key[i, 0], DataGame.key[i, 1], DataGame.key[i, 2], DataGame.key[i, 3], DataGame.key[i, 4], DataGame.key[i, 5] };
+            players[i].StartEngine(control, btnsAdd[i], btnsRem[i],textsPoint[i]);
         }
     }
 

@@ -51,6 +51,11 @@ public class PlayerCell : CellGame
         base.Create(typeStr);
     }
 
+    public void Disconnect()
+    {
+
+    }
+
     public PlayerCell Connect(Vector2 velocity)
     {
         int nextI = iTarget + (int)velocity.x;

@@ -20,6 +20,7 @@ public class EditScene : MonoBehaviour {
 
     public Text inputX;
     public Text inputY;
+    public Text inputWordResult;
     private int x = 5 + 2;
     private int y = 5 + 2;
     public Vector2 startPos;
@@ -156,6 +157,7 @@ public class EditScene : MonoBehaviour {
             }
         }
         PlayerPrefs.SetString("map", m);
+        PlayerPrefs.SetString("words", inputWordResult.text);
         PlayerPrefs.SetInt("x", x);
         PlayerPrefs.SetInt("y", y);
         DataGame.x = x-2;
