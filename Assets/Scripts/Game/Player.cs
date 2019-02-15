@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     private Button btnAdd;
     private Button btnRem;
     private Text textPoints;
+    private GameObject arrow;
 
     //характеристики поезда
     float speed;
@@ -30,8 +31,8 @@ public class Player : MonoBehaviour
     bool move;
     Color myColor;
 
-    //
-    public bool connectIf;
+    //игровые переменные
+    public bool connectIf;//возможность соед.
 
     //статистика поезда
     private float _score;
@@ -46,10 +47,23 @@ public class Player : MonoBehaviour
 
     public void Create(string typeStr, int i, int j, Color color)
     {
+        CreateArrow();
         myColor = color;
         speed = DataGame.speed;
         playerCells.Add(CreateCell(typeStr,i,j));
         StartVelocity(i,j);
+    }
+
+    void CreateArrow()
+    {
+        arrow = (GameObject)Instantiate(Resources.Load("Arrow"), transform);
+        arrow.GetComponent<RectTransform>().sizeDelta = Main.instance.sizeBtn;
+    }
+
+    void UpdatePosArrow(Transform target)
+    {
+        arrow.transform.SetParent(target);
+        arrow.transform.localPosition = Vector3.zero;
     }
 
     public void StartEngine(KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
@@ -72,6 +86,7 @@ public class Player : MonoBehaviour
     }
     void RemovePlayerCells()
     {
+        UpdatePosArrow(playerCells[0].transform);
         for (int i = 1; i < playerCells.Count; i++)
         {
             playerCells[i].DestroyCell();
@@ -135,6 +150,7 @@ public class Player : MonoBehaviour
         }
         move = true;
         playerCells.Add(playerHead.Connect(velocity));
+        UpdatePosArrow(playerHead.transform);
     }
 
     void ButtonActivate(Button btnAdd, Button btnRem)
@@ -198,6 +214,7 @@ public class Player : MonoBehaviour
             if (velocity != new Vector2(0, -1))
                 velocity = new Vector2(0, 1);
         }
+        UpdateRotArrow();
         if (Input.GetKeyDown(key[4]) && connectIf)
         {
             Connect();
@@ -206,5 +223,16 @@ public class Player : MonoBehaviour
         {
             Disconnect();
         }
+    }
+    void UpdateRotArrow()
+    {
+        if(velocity == new Vector2(0,-1))
+            arrow.transform.rotation = Quaternion.Euler(Vector3.zero);
+        if(velocity == new Vector2(0,1))
+            arrow.transform.rotation = Quaternion.Euler(new Vector3(0, 0,-180));
+        if (velocity == new Vector2(1, 0))
+            arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, -90));
+        if (velocity == new Vector2(-1, 0))
+            arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, 90));
     }
 }
