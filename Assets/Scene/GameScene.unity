@@ -352,7 +352,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 123
+  m_Text: 0
 --- !u!222 &485781992
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1532,6 +1532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8412d290981cee4abec85ace6040ab4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resultWords: []
   parent: {fileID: 1120971819}
   sizeBtn: {x: 60, y: 60}
   players: []
@@ -1650,7 +1651,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 123
+  m_Text: 0
 --- !u!222 &1619999951
 CanvasRenderer:
   m_ObjectHideFlags: 0

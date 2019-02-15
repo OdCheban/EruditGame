@@ -34,7 +34,15 @@ public class Player : MonoBehaviour
     public bool connectIf;
 
     //статистика поезда
-    public float score;
+    private float _score;
+    public float score
+    {
+        get { return _score; }
+        set {
+            _score = value;
+            textPoints.text = _score.ToString();
+        }
+    }
 
     public void Create(string typeStr, int i, int j, Color color)
     {
@@ -47,13 +55,33 @@ public class Player : MonoBehaviour
     public void StartEngine(KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
     {
         textPoints.gameObject.SetActive(true);
+        this.textPoints = textPoints;
         ButtonActivate(btnAdd, btnRem);
         this.key = key;
-        this.textPoints = textPoints;
 
         transform.SetAsLastSibling();
         playerHead.NextCell(velocity);
         move = true;
+    }
+    string WordPlayer()
+    {
+        string m = "";
+        for (int i = 1; i < playerCells.Count; i++)
+            m += playerCells[i].str;
+        return m.ToLower();
+    }
+    void RemovePlayerCells()
+    {
+        for (int i = 1; i < playerCells.Count; i++)
+        {
+            playerCells[i].DestroyCell();
+            
+        }
+        int k = playerCells.Count;
+        for (int i = 1; i < k; i++)
+        {
+            playerCells.RemoveAt(1);
+        }
     }
 
     void Update()
@@ -62,10 +90,17 @@ public class Player : MonoBehaviour
         {
             Controll();
             MovePlayer();
+            if(playerHead.ExitABC())
+            {
+                for(int i = 0; i < Main.instance.resultWords.Length;i++)
+                    if(Main.instance.resultWords[i] == WordPlayer())
+                    {
+                        score += WordPlayer().Length;
+                        RemovePlayerCells();
+                    }
+            }
             connectIf = playerHead.CheckArrive(velocity);
-
             btnAdd.interactable = connectIf;
-            textPoints.text = score.ToString();
         }
     }
 

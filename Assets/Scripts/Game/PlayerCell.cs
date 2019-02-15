@@ -30,6 +30,8 @@ public class PlayerCell : CellGame
         int nextJ = jTarget + (int)velocity.y;
         if (dist < 0.1f)
         {
+            iPos = iTarget;
+            jPos = jTarget;
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
                 arrive = (Main.instance.cells[nextI, nextJ].isAbc) ? true : false;
@@ -41,6 +43,11 @@ public class PlayerCell : CellGame
             }
         }
         return arrive;
+    }
+
+    public bool ExitABC()
+    {
+        return (iPos-1 == 0 || jPos-1 == 0 || iPos+2 == DataGame.x || jPos+2 == DataGame.y);
     }
 
     public void Create(string typeStr, int i, int j,Player player)
@@ -77,10 +84,16 @@ public class PlayerCell : CellGame
         Main.instance.cells[i, j].Occup();
     }
 
-    public void LeaveTo(int i, int j)
+    public void DestroyCell()
     {
         iPos = iTarget;
         jPos = jTarget;
+        Main.instance.cells[iPos, jPos].Leave();
+        Destroy(gameObject);
+    }
+
+    public void LeaveTo(int i, int j)
+    {
         PlayerCell prev = player.getPrev(this);
         if (prev != null)
         {
@@ -92,6 +105,8 @@ public class PlayerCell : CellGame
 
     public void FollowMe(int iTo, int jTo)
     {
+        iPos = iTarget;
+        jPos = jTarget;
         iTarget = iTo;
         jTarget = jTo;
         OccupTo(iTarget, jTarget);
