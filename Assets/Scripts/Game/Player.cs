@@ -26,7 +26,7 @@ public class Player : MonoBehaviour
     private GameObject arrow;
 
     //характеристики поезда
-    float speed;
+    public float speed;
     public Vector2 velocity;
     bool move;
     Color myColor;
@@ -134,8 +134,9 @@ public class Player : MonoBehaviour
     {
         if (playerCells.Count > 1)
         {
-            playerCells[1].Disconnect();
-            playerCells.Remove(playerCells[1]);
+            playerCells.Last().Disconnect();
+            playerCells.Remove(playerCells.Last());
+            UpdatePosArrow(playerHead.transform);
         }
     }
 

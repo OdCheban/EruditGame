@@ -47,10 +47,16 @@ public class CellGame : MonoBehaviour {
         occup = false;
         GetComponent<Image>().color = Color.white;
     }
+
+    public void SetValue(string m)
+    {
+        occup = true;
+        str = m;
+    }
     public void Clear()
     {
         occup = false;
-        txt.text = "";
+        str = "";
     }
 
 }

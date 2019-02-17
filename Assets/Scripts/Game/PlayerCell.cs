@@ -11,6 +11,7 @@ public class PlayerCell : CellGame
     public int jPos;
     public int iTarget;
     public int jTarget;
+    public bool unConnect;
 
     public void MoveCell(float speed)
     {
@@ -22,13 +23,18 @@ public class PlayerCell : CellGame
         position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
     }
 
+    bool hasArrived()
+    {
+        float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
+        return (dist < 0.1f);
+    }
+
     public bool CheckArrive(Vector2 velocity)
     {
         bool arrive = false;
-        float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
         int nextI = iTarget + (int)velocity.x;
         int nextJ = jTarget + (int)velocity.y;
-        if (dist < 0.1f)
+        if (hasArrived()) 
         {
             iPos = iTarget;
             jPos = jTarget;
@@ -60,8 +66,26 @@ public class PlayerCell : CellGame
 
     public void Disconnect()
     {
-
+        unConnect = true;
     }
+
+    private void Update()
+    {
+        if (unConnect)
+        {
+            if (!hasArrived())
+                MoveCell(player.speed);
+            else
+            {
+                iPos = iTarget;
+                jPos = jTarget;
+                Main.instance.cells[iPos, jPos].GetComponent<Image>().color = Color.white;
+                Main.instance.cells[iPos, jPos].SetValue(str);
+                Destroy(gameObject);
+            }
+        }
+    }
+
 
     public PlayerCell Connect(Vector2 velocity)
     {
