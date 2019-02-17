@@ -50,6 +50,7 @@ public class CellGame : MonoBehaviour {
 
     public void SetValue(string m)
     {
+        GetComponent<Image>().color = Color.white;
         occup = true;
         str = m;
     }

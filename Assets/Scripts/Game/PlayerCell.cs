@@ -23,13 +23,13 @@ public class PlayerCell : CellGame
         position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
     }
 
-    bool hasArrived()
+    public bool hasArrived()
     {
         float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
         return (dist < 0.1f);
     }
 
-    public bool CheckArrive(Vector2 velocity)
+    public bool CheckArrive(Vector2 velocity,bool moveMode)
     {
         bool arrive = false;
         int nextI = iTarget + (int)velocity.x;
@@ -44,6 +44,7 @@ public class PlayerCell : CellGame
                 if (!Main.instance.cells[nextI, nextJ].occup)
                 {
                     LeaveTo(iTarget, jTarget);
+                    if(!moveMode)
                     NextCell(velocity);
                 }
             }
@@ -77,10 +78,7 @@ public class PlayerCell : CellGame
                 MoveCell(player.speed);
             else
             {
-                iPos = iTarget;
-                jPos = jTarget;
-                Main.instance.cells[iPos, jPos].GetComponent<Image>().color = Color.white;
-                Main.instance.cells[iPos, jPos].SetValue(str);
+                Main.instance.cells[iTarget, jTarget].SetValue(str);
                 Destroy(gameObject);
             }
         }

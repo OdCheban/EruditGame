@@ -11,6 +11,7 @@ public class Menu : MonoBehaviour {
         else
         {
             DataGame.x = DataGame.y = 5;
+            DataGame.move = PlayerPrefs.GetInt("move");
         }
     }
     public void StartGame()

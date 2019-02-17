@@ -21,6 +21,7 @@ public class EditScene : MonoBehaviour {
     public Text inputX;
     public Text inputY;
     public Text inputWordResult;
+    public Slider moveMode;
     private int x = 5 + 2;
     private int y = 5 + 2;
     public Vector2 startPos;
@@ -160,6 +161,7 @@ public class EditScene : MonoBehaviour {
         PlayerPrefs.SetString("words", inputWordResult.text);
         PlayerPrefs.SetInt("x", x);
         PlayerPrefs.SetInt("y", y);
+        PlayerPrefs.SetInt("move", (int)moveMode.value);
         DataGame.x = x-2;
         DataGame.y = y-2;
     }

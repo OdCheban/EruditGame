@@ -16,10 +16,11 @@ public class DataGame : MonoBehaviour {
         get { return _y + 2; }
         set { _y = value; }
     }
+    public static int move;//0 без остановок 1 с остановками
     public static float speed = 140.0f;
     public static float timeGame = 60.0f;
     public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
-    public static KeyCode[,] key = new KeyCode[2,6] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M } };
+    public static KeyCode[,] key = new KeyCode[2,7] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X,KeyCode.Q },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M,KeyCode.Space } };
     public static bool ExitRange(int i, int j,int iMax = 0, int jMax = 0)
     {
         if (iMax == 0) { iMax = x; jMax = y; }

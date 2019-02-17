@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     private GameObject arrow;
 
     //характеристики поезда
+    public int moveMode;
     public float speed;
     public Vector2 velocity;
     bool move;
@@ -66,8 +67,9 @@ public class Player : MonoBehaviour
         arrow.transform.localPosition = Vector3.zero;
     }
 
-    public void StartEngine(KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
+    public void StartEngine(int moveMode, KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
     {
+        this.moveMode = moveMode;
         textPoints.gameObject.SetActive(true);
         this.textPoints = textPoints;
         ButtonActivate(btnAdd, btnRem);
@@ -101,9 +103,9 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        Controll();
         if (move)
         {
-            Controll();
             MovePlayer();
             if(playerHead.ExitABC())
             {
@@ -114,7 +116,10 @@ public class Player : MonoBehaviour
                         RemovePlayerCells();
                     }
             }
-            connectIf = playerHead.CheckArrive(velocity);
+            
+            connectIf = playerHead.CheckArrive(velocity,moveMode == 1);
+           // if (moveMode == 1 && player)
+            //    EngineOff();
             btnAdd.interactable = connectIf;
         }
     }
@@ -195,25 +200,36 @@ public class Player : MonoBehaviour
 
     void Controll()
     {
-        if (Input.GetKeyDown(key[0]))
+        if (Input.GetKeyDown(key[0]) || Input.GetKeyDown(key[1]) || Input.GetKeyDown(key[2]) || Input.GetKeyDown(key[3]))
         {
-            if (velocity != new Vector2(1, 0))
-                velocity = new Vector2(-1, 0);
+            if (Input.GetKeyDown(key[0]))
+            {
+                if (velocity != new Vector2(1, 0))
+                    velocity = new Vector2(-1, 0);
+            }
+            if (Input.GetKeyDown(key[1]))
+            {
+                if (velocity != new Vector2(-1, 0))
+                    velocity = new Vector2(1, 0);
+            }
+            if (Input.GetKeyDown(key[2]))
+            {
+                if (velocity != new Vector2(0, 1))
+                    velocity = new Vector2(0, -1);
+            }
+            if (Input.GetKeyDown(key[3]))
+            {
+                if (velocity != new Vector2(0, -1))
+                    velocity = new Vector2(0, 1);
+            }
+
+            if(moveMode == 1)
+                playerHead.NextCell(velocity);
+            move = true;
         }
-        if (Input.GetKeyDown(key[1]))
+        if (Input.GetKeyDown(key[6]))
         {
-            if (velocity != new Vector2(-1, 0))
-                velocity = new Vector2(1, 0);
-        }
-        if (Input.GetKeyDown(key[2]))
-        {
-            if (velocity != new Vector2(0, 1))
-                velocity = new Vector2(0, -1);
-        }
-        if (Input.GetKeyDown(key[3]))
-        {
-            if (velocity != new Vector2(0, -1))
-                velocity = new Vector2(0, 1);
+            EngineOff();
         }
         UpdateRotArrow();
         if (Input.GetKeyDown(key[4]) && connectIf)
@@ -225,6 +241,12 @@ public class Player : MonoBehaviour
             Disconnect();
         }
     }
+
+    void EngineOff()
+    {
+        move = false;
+        arrow.SetActive(false);
+    }
     void UpdateRotArrow()
     {
         if(velocity == new Vector2(0,-1))
@@ -235,5 +257,7 @@ public class Player : MonoBehaviour
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, -90));
         if (velocity == new Vector2(-1, 0))
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, 90));
+        if (velocity != Vector2.zero)
+            arrow.SetActive(true);
     }
 }
