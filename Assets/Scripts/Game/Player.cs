@@ -26,7 +26,8 @@ public class Player : MonoBehaviour
     private GameObject arrow;
 
     //характеристики поезда
-    public int moveMode;
+    public enum MoveMode { Hard,Easy };
+    public MoveMode moveMode;
     public float speed;
     public Vector2 velocity;
     bool move;
@@ -70,7 +71,7 @@ public class Player : MonoBehaviour
 
     public void StartEngine(int moveMode, KeyCode[] key, Button btnAdd, Button btnRem, Text textPoints)
     {
-        this.moveMode = moveMode;
+        this.moveMode = (MoveMode)moveMode;
         textPoints.gameObject.SetActive(true);
         this.textPoints = textPoints;
         ButtonActivate(btnAdd, btnRem);
@@ -119,7 +120,7 @@ public class Player : MonoBehaviour
                     }
             }
             
-            connectIf = playerHead.CheckArrive(velocity,moveMode == 1);
+            connectIf = playerHead.CheckArrive(velocity,moveMode);
             btnAdd.interactable = connectIf;
         }
     }
@@ -200,7 +201,8 @@ public class Player : MonoBehaviour
 
     void Controll()
     {
-        if (Input.GetKeyDown(key[0]) || Input.GetKeyDown(key[1]) || Input.GetKeyDown(key[2]) || Input.GetKeyDown(key[3]))
+        if (((playerHead.hasArrived() && moveMode == MoveMode.Easy) || moveMode == MoveMode.Hard) && 
+            (Input.GetKeyDown(key[0]) || Input.GetKeyDown(key[1]) || Input.GetKeyDown(key[2]) || Input.GetKeyDown(key[3])))
         {
             if (Input.GetKeyDown(key[0]))
             {
@@ -223,7 +225,7 @@ public class Player : MonoBehaviour
                     velocity = new Vector2(0, 1);
             }
 
-            if(moveMode == 1)
+            if (moveMode == MoveMode.Easy)
                 playerHead.NextCell(velocity);
             move = true;
         }
@@ -257,7 +259,7 @@ public class Player : MonoBehaviour
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, -90));
         if (velocity == new Vector2(-1, 0))
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, 90));
-        if (!move)
+        if (move)
             arrow.SetActive(true);
     }
 }

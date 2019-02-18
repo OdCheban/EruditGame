@@ -29,7 +29,7 @@ public class PlayerCell : CellGame
         return (dist < 0.1f);
     }
 
-    public bool CheckArrive(Vector2 velocity,bool moveMode)
+    public bool CheckArrive(Vector2 velocity,Player.MoveMode moveMode)
     {
         bool arrive = false;
         int nextI = iTarget + (int)velocity.x;
@@ -41,12 +41,8 @@ public class PlayerCell : CellGame
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
                 arrive = (Main.instance.cells[nextI, nextJ].isAbc) ? true : false;
-                if (!Main.instance.cells[nextI, nextJ].occup)
-                {
-                    LeaveTo(iTarget, jTarget);
-                    if(!moveMode)
+                if (moveMode == Player.MoveMode.Hard)
                     NextCell(velocity);
-                }
             }
         }
         return arrive;
@@ -91,6 +87,7 @@ public class PlayerCell : CellGame
         int nextJ = jTarget + (int)velocity.y;
         string nameCell = Main.instance.cells[nextI, nextJ].str;
         Main.instance.cells[nextI, nextJ].Clear();
+        OccupTo(nextI, nextJ);
         return CreateVagon(nameCell, nextI, nextJ);
     }
 
@@ -121,7 +118,7 @@ public class PlayerCell : CellGame
         {
             prev.LeaveTo(prev.iTarget, prev.jTarget);
         }
-        if (Main.instance.cells[i, j] != this)
+        if (DataGame.ExitRangeGame(i, j) && Main.instance.cells[i, j] != this )
             Main.instance.cells[i, j].Leave();
     }
 
@@ -141,13 +138,22 @@ public class PlayerCell : CellGame
 
     public void NextCell(Vector2 velocity)
     {
-        PlayerCell prev = player.getPrev(this);
-        if (prev != null)
+        int nextI = iTarget + (int)velocity.x;
+        int nextJ = jTarget + (int)velocity.y;
+        if (DataGame.ExitRangeGame(nextI, nextJ))
         {
-            prev.FollowMe(iTarget, jTarget);
+            if (!Main.instance.cells[nextI, nextJ].occup)
+            {
+                LeaveTo(iPos, jPos);
+                PlayerCell prev = player.getPrev(this);
+                if (prev != null)
+                {
+                    prev.FollowMe(iTarget, jTarget);
+                }
+                iTarget += (int)velocity.x;
+                jTarget += (int)velocity.y;
+                OccupTo(iTarget, jTarget);
+            }
         }
-        iTarget += (int)velocity.x;
-        jTarget += (int)velocity.y;
-        OccupTo(iTarget, jTarget);
     }
 }

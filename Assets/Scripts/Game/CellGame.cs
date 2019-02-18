@@ -25,17 +25,13 @@ public class CellGame : MonoBehaviour {
     {
         txt = transform.GetChild(0).GetComponent<Text>();
     }
-    protected virtual void Init()
-    {
-        if (txt.text != "")
-            occup = true;
-    }
-
     public virtual void Create(string typeStr)
     {
-        if (typeStr != "cell") 
-        txt.text = typeStr;
-        Init();
+        if (typeStr != "cell")
+        {
+            str = typeStr;
+            occup = true;
+        }
     }
     public void Occup()
     {
