@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
 
     //игровые переменные
     public bool connectIf;//возможность соед.
+    private bool processConnect;
 
     //статистика поезда
     private float _score;
@@ -103,7 +104,8 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Controll();
+        if(!processConnect)
+            Controll();
         if (move)
         {
             MovePlayer();
@@ -118,8 +120,6 @@ public class Player : MonoBehaviour
             }
             
             connectIf = playerHead.CheckArrive(velocity,moveMode == 1);
-           // if (moveMode == 1 && player)
-            //    EngineOff();
             btnAdd.interactable = connectIf;
         }
     }
@@ -147,16 +147,16 @@ public class Player : MonoBehaviour
 
     IEnumerator ConnectAnimation()
     {
-        move = false;
+        processConnect = true;
         btnAdd.GetComponent<Image>().fillAmount = 0;
         while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
             btnAdd.GetComponent<Image>().fillAmount += 0.01f;
             yield return new WaitForEndOfFrame();
         }
-        move = true;
         playerCells.Add(playerHead.Connect(velocity));
         UpdatePosArrow(playerHead.transform);
+        processConnect = false;
     }
 
     void ButtonActivate(Button btnAdd, Button btnRem)
@@ -257,7 +257,7 @@ public class Player : MonoBehaviour
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, -90));
         if (velocity == new Vector2(-1, 0))
             arrow.transform.rotation = Quaternion.Euler(new Vector3(0,0, 90));
-        if (velocity != Vector2.zero)
+        if (!move)
             arrow.SetActive(true);
     }
 }
