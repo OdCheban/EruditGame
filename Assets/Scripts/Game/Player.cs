@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
     public float speed;
     public float FullSpeed
     {
-        get { return DataGame.speed - (playerCells.Count - 1) * DataGame.speedVagon; }
+        get { return Mathf.Clamp((DataGame.sizeBtn* DataGame.speed) - (playerCells.Count - 1) * (DataGame.speedVagon * DataGame.sizeBtn), 0, float.MaxValue); }
     }
     public Vector2 velocity;
     bool move;
@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
     void CreateArrow()
     {
         arrow = (GameObject)Instantiate(Resources.Load("Arrow"), transform);
-        arrow.GetComponent<RectTransform>().sizeDelta = Main.instance.sizeBtn;
+        arrow.GetComponent<RectTransform>().sizeDelta = new Vector2(DataGame.sizeBtn,DataGame.sizeBtn);
     }
 
     void UpdatePosArrow(Transform target)
@@ -117,12 +117,12 @@ public class Player : MonoBehaviour
             MovePlayer();
             if(playerHead.ExitABC())
             {
-                for(int i = 0; i < Main.instance.resultWords.Length;i++)
-                    if(Main.instance.resultWords[i] == WordPlayer())
+                foreach(string resultWords in DataGame.abcResult)
+                    if(resultWords == WordPlayer())
                     {
                         for (int j = 1; j < playerCells.Count; j++)
                         {
-                            score += DataGame.ABC[playerCells[j].str];
+                            score += DataGame.ABC[playerCells[j].str.ToLower()];
                         }
                         score += WordPlayer().Length * DataGame.xBonus;
                         RemovePlayerCells();
@@ -158,7 +158,7 @@ public class Player : MonoBehaviour
         btnRem.GetComponent<Image>().fillAmount = 0;
         while (btnRem.GetComponent<Image>().fillAmount < 1.0f)
         {
-            btnRem.GetComponent<Image>().fillAmount += (DataGame.speedDisconnect/1000);
+            btnRem.GetComponent<Image>().fillAmount += DataGame.speedDisconnect;
             yield return new WaitForEndOfFrame();
         }
         playerCells.Last().Disconnect();
@@ -175,7 +175,7 @@ public class Player : MonoBehaviour
         btnAdd.GetComponent<Image>().fillAmount = 0;
         while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
-            btnAdd.GetComponent<Image>().fillAmount += (DataGame.speedConnect/1000);
+            btnAdd.GetComponent<Image>().fillAmount += DataGame.speedConnect;
             yield return new WaitForEndOfFrame();
         }
         playerCells.Add(playerHead.Connect(velocity));
@@ -233,21 +233,25 @@ public class Player : MonoBehaviour
             {
                 if (velocity != new Vector2(1, 0))
                     velocity = new Vector2(-1, 0);
+                else return;
             }
             if (Input.GetKeyDown(key[1]))
             {
                 if (velocity != new Vector2(-1, 0))
                     velocity = new Vector2(1, 0);
+                else return;
             }
             if (Input.GetKeyDown(key[2]))
             {
                 if (velocity != new Vector2(0, 1))
                     velocity = new Vector2(0, -1);
+                else return;
             }
             if (Input.GetKeyDown(key[3]))
             {
                 if (velocity != new Vector2(0, -1))
                     velocity = new Vector2(0, 1);
+                else return;
             }
 
             if (moveMode == MoveMode.Easy)

@@ -1,44 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DataGame : MonoBehaviour {
 
-    private static int _x = 5;
-    public static int x
-    {
-        get { return _x + 2; }
-        set { _x = value; }
-    }
-    private static int _y = 5;
+    private static int _x;
+    private static int _y;
+    public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
+    public static KeyCode[,] key = new KeyCode[2,7] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X,KeyCode.Q },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M,KeyCode.Space } };
+
+    public static List<List<string>> map;
+    public static List<string> abcResult;
     public static int y
     {
         get { return _y + 2; }
         set { _y = value; }
     }
-    public static int move;//0 без остановок 1 с остановками
-    public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
-    public static KeyCode[,] key = new KeyCode[2,7] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X,KeyCode.Q },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M,KeyCode.Space } };
-    public static bool ExitRange(int i, int j,int iMax = 0, int jMax = 0)
+    public static int x
     {
-        if (iMax == 0) { iMax = x; jMax = y; }
-        return ((i != 0 || j != 0) &&
-                   (i != iMax-1 || j != 0) &&
-                   (i != 0 || j != jMax-1 ) &&
-                   (i != iMax-1 || j != jMax-1));
+        get { return _x + 2; }
+        set { _x = value; }
     }
-    public static bool ExitRangeGame(int i, int j)
-    {
-        return (i != 0 && j != 0) && (i < x-1 && j < y-1);
-    }
+    public static int modeMove;//0(hard)/1(easy)
+    public static float timeExit;
+    public static float timeGame;
+    public static float speed;
+    public static float speedVagon;
+    public static float speedConnect;
+    public static float speedDisconnect;
+    public static float xBonus;
+    public static int sizeBtn = 60;
 
-    public static float timeExit = 5.0f;
-    public static float timeGame = 60.0f;
-    public static float speed = 140.0f;
-    public static float speedVagon = 10.0f;
-    public static float speedConnect = 3.0f;
-    public static float speedDisconnect = 5.0f;
-    public static float xBonus = 1;
     public static Dictionary<string,int> ABC = new Dictionary<string, int>() {
         { "a", 1 },
         { "б", 3 },
@@ -73,4 +66,68 @@ public class DataGame : MonoBehaviour {
         { "ю", 10 },
         { "я", 3 },
     };
+    public static bool ExitRange(int i, int j, int iMax = 0, int jMax = 0)
+    {
+        if (iMax == 0) { iMax = x; jMax = y; }
+        return ((i != 0 || j != 0) &&
+                   (i != iMax - 1 || j != 0) &&
+                   (i != 0 || j != jMax - 1) &&
+                   (i != iMax - 1 || j != jMax - 1));
+    }
+    public static bool ExitRangeGame(int i, int j)
+    {
+        return (i != 0 && j != 0) && (i < x - 1 && j < y - 1);
+    }
+
+    public static void LoadData()
+    {
+        x = PlayerPrefs.GetInt("x", 5);
+        y = PlayerPrefs.GetInt("y", 5);
+        modeMove = PlayerPrefs.GetInt("move", 0);
+        timeExit = PlayerPrefs.GetFloat("timeExit", 2.0f);
+        timeGame = PlayerPrefs.GetFloat("timeGame", 60);
+        speed = PlayerPrefs.GetFloat("speed", 1.5f);
+        speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
+        speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
+        speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
+        xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
+        abcResult = PlayerPrefs.GetString("words", "слова мяч огонь вода яд").Split(' ','\n').ToList();
+        string m = PlayerPrefs.GetString("map", "");
+        if (m == "")
+        {
+            map = new List<List<string>>()
+            {
+                new List<string>() { "null", "null", "null", "null", "null" },
+                new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
+                new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "player" },
+                new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
+                new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
+                new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
+                new List<string>() { "null", "null", "null", "null", "null" }
+            };
+        }
+        else
+        {
+            string[] mm = m.Split(' ');
+            List<List<string>> m_map = new List<List<string>>();
+            int k = 0;
+            for (int i = 0; i < x; i++)
+            {
+                List<string> str = new List<string>();
+                for (int j = 0; j < y; j++)
+                {
+                    if (ExitRange(i, j, x, y))
+                    {
+                        str.Add(mm[k]);
+                        k++;
+                    }
+                }
+                m_map.Add(str);
+            }
+            map = m_map;
+
+
+        }
+    }
+
 }

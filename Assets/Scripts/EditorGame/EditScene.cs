@@ -18,21 +18,20 @@ public class EditScene : MonoBehaviour {
         return instance;
     }
 
-    public Text inputX;
-    public Text inputY;
-    public Text inputWordResult;
-    public Text timeExit;
-    public Text timeGame;
-    public Text speed;
-    public Text speedVagon;
-    public Text speedConnect;
-    public Text speedDisconnect;
-    public Text xBonus;
-
+    public InputField inputX;
+    public InputField inputY;
+    public InputField inputWordResult;
+    public InputField timeExit;
+    public InputField timeGame;
+    public InputField speed;
+    public InputField speedVagon;
+    public InputField speedConnect;
+    public InputField speedDisconnect;
+    public InputField xBonus;
 
     public Slider moveMode;
-    private int x = 5 + 2;
-    private int y = 5 + 2;
+    private int x;
+    private int y;
     public Vector2 startPos;
     public Transform cellBtn;
     public Transform parent;
@@ -55,7 +54,7 @@ public class EditScene : MonoBehaviour {
     private void Awake()
     {
         instance = this;
-        CreateField();
+        LoadFieldSettings();
         AddListenerAbc();
         ScaleParent();
     }
@@ -96,10 +95,51 @@ public class EditScene : MonoBehaviour {
             {
                 if (DataGame.ExitRange(i, j,x,y))
                 {
-                    if ((j == y -1) || (j == 0) || (i== x-1) || (i == 0))
-                        CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), Cell.TypeBtn.Player);
-                    else
-                        CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), Cell.TypeBtn.Default);
+                    bool whoIs = ((j == y - 1) || (j == 0) || (i == x - 1) || (i == 0));
+                    Cell.TypeBtn who = (whoIs) ? Cell.TypeBtn.Player : Cell.TypeBtn.Default;
+                    CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), who);
+                }
+            }
+        }
+    }
+
+
+    private void LoadFieldSettings()
+    {
+        x = DataGame.x;
+        y = DataGame.y;
+        ScaleParent();
+        LoadSettings();
+        LoadField();
+    }
+    private void LoadSettings()
+    {
+        inputX.text = DataGame.x.ToString();
+        inputY.text = DataGame.y.ToString();
+        inputWordResult.text = string.Join(" ", DataGame.abcResult.ToArray());
+        timeExit.text = DataGame.timeExit.ToString();
+        timeGame.text = DataGame.timeGame.ToString();
+        speed.text = DataGame.speed.ToString();
+        speedVagon.text = DataGame.speedVagon.ToString();
+        speedConnect.text = DataGame.speedConnect.ToString();
+        speedDisconnect.text = DataGame.speedDisconnect.ToString();
+        xBonus.text = DataGame.xBonus.ToString();
+        moveMode.value = DataGame.modeMove;
+    }
+    private void LoadField()
+    {
+        Vector2 size = new Vector2(cellBtn.GetComponent<RectTransform>().rect.width, cellBtn.GetComponent<RectTransform>().rect.height);
+        for (int i = 0; i < DataGame.x; i++)
+        {
+            int iY = 0; 
+            for (int j = 0; j < DataGame.y; j++)
+            {
+                if (DataGame.ExitRange(i, j, x, y))
+                {
+                    bool whoIs = ((j == y - 1) || (j == 0) || (i == x - 1) || (i == 0));
+                    Cell.TypeBtn who = (whoIs) ? Cell.TypeBtn.Player : Cell.TypeBtn.Default;
+                    CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), who,DataGame.map[i][iY]);
+                    iY++;
                 }
             }
         }
@@ -121,8 +161,7 @@ public class EditScene : MonoBehaviour {
             lastBtn = null;
         }
     }
-
-    void CreateBtn(Vector2 pos,Cell.TypeBtn type)
+    void CreateBtn(Vector2 pos,Cell.TypeBtn type,string txt = "")
     {
         GameObject btn = (GameObject)Instantiate(Resources.Load("CellBtn"), parent);
         Vector2 offset = new Vector2(-x * 42/2, y*45/2);
@@ -131,10 +170,23 @@ public class EditScene : MonoBehaviour {
         btnCell.Create(type);
         btn.GetComponent<Button>().onClick.AddListener(() => ClickCell(btnCell,ref lastBtnCell));
         cells.Add(btnCell);
-    }
 
+        if(txt != "cell" && txt != "null")
+        btnCell.txt.text = txt;
+    }
     void SaveMap()
     {
+        PlayerPrefs.SetString("words", inputWordResult.text);
+        PlayerPrefs.SetFloat("timeExit", float.Parse(timeExit.text));
+        PlayerPrefs.SetFloat("timeGame", float.Parse(timeGame.text));
+        PlayerPrefs.SetFloat("speed", float.Parse(speed.text));
+        PlayerPrefs.SetFloat("speedVagon", float.Parse(speedVagon.text));
+        PlayerPrefs.SetFloat("speedConnect", float.Parse(speedConnect.text));
+        PlayerPrefs.SetFloat("speedDisconnect", float.Parse(speedDisconnect.text));
+        PlayerPrefs.SetFloat("xBonus", float.Parse(xBonus.text));
+        PlayerPrefs.SetInt("x", x-2);
+        PlayerPrefs.SetInt("y", y-2);
+        PlayerPrefs.SetInt("move", (int)moveMode.value);
         string m = "";
         foreach(Cell cell in cells)
         {
@@ -167,30 +219,14 @@ public class EditScene : MonoBehaviour {
             }
         }
         PlayerPrefs.SetString("map", m);
-        PlayerPrefs.SetString("words", inputWordResult.text);
-
-        PlayerPrefs.SetInt("timeExit", int.Parse(timeExit.text));
-        PlayerPrefs.SetInt("timeGame", int.Parse(timeGame.text));
-        PlayerPrefs.SetInt("speed", int.Parse(speed.text));
-        PlayerPrefs.SetInt("speedVagon", int.Parse(speedVagon.text));
-        PlayerPrefs.SetInt("speedConnect", int.Parse(speedConnect.text));
-        PlayerPrefs.SetInt("speedDisconnect", int.Parse(speedDisconnect.text));
-        PlayerPrefs.SetInt("xBonus", int.Parse(xBonus.text));
-
-        PlayerPrefs.SetInt("x", x);
-        PlayerPrefs.SetInt("y", y);
-        PlayerPrefs.SetInt("move", (int)moveMode.value);
-        DataGame.x = x-2;
-        DataGame.y = y-2;
     }
-
     public void Save()
     {
         SaveMap();
+        DataGame.LoadData();
     }
     public void Menu()
     {
         SceneManager.LoadScene("Menu");
-    }
-    
+    } 
 }

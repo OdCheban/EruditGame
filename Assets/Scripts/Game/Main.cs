@@ -6,15 +6,14 @@ using UnityEngine.UI;
 public class Main : MonoBehaviour {
     public static Main instance;
 
-    public string[] resultWords;
     public CellGame[,] cells = new CellGame[DataGame.x, DataGame.y];
     public Transform parent;
-    public Vector2 sizeBtn;
 
     public List<Player> players = new List<Player>();
     public Button[] btnsAdd;
     public Button[] btnsRem;
     public Text[] textsPoint;
+    public GameObject readyGame;
 
     private void Awake()
     {
@@ -24,12 +23,10 @@ public class Main : MonoBehaviour {
 
     private void CreateMap()
     {
-        resultWords = PlayerPrefs.GetString("words").Split(' ', '\n');
-        string m = PlayerPrefs.GetString("map");
-        string[] map = m.Split(' ');
         ScaleParent();
-        int q = 0;
         for (int i = 0; i < DataGame.x; i++)
+        {
+            int q = 0;
             for (int j = 0; j < DataGame.y; j++)
             {
                 if ((i != 0 || j != 0) &&
@@ -37,11 +34,11 @@ public class Main : MonoBehaviour {
                    (i != 0 || j != DataGame.y - 1) &&
                    (i != DataGame.x - 1 || j != DataGame.y - 1))
                 {
-                    CreateCell(i, j, map[q]);
+                    CreateCell(i, j, DataGame.map[i][q]);
                     q++;
                 }
             }
-
+        }
         for (int i = 0; i < players.Count; i++)
             players[i].gameObject.SetActive(false);
         StartCoroutine(StartGame());
@@ -50,6 +47,8 @@ public class Main : MonoBehaviour {
     IEnumerator StartGame()
     {
         yield return new WaitForSeconds(DataGame.timeExit);
+        readyGame.SetActive(false);
+        GetComponent<Timer>().enabled = true;
         for (int i = 0; i < players.Count; i++)
         {
             KeyCode[] control = new KeyCode[7] { DataGame.key[i, 0], DataGame.key[i, 1], DataGame.key[i, 2], DataGame.key[i, 3], DataGame.key[i, 4], DataGame.key[i, 5], DataGame.key[i, 6] };
@@ -70,7 +69,7 @@ public class Main : MonoBehaviour {
         {
             GameObject btn = CreateGOcell();
             Vector2 offset = new Vector2(-DataGame.x * 60 / 2, DataGame.y * 60 / 2);
-            btn.transform.localPosition = offset + new Vector2((i+0.5f) * sizeBtn.x, -(j+0.5f) * sizeBtn.y);
+            btn.transform.localPosition = offset + new Vector2((i+0.5f) * DataGame.sizeBtn, -(j+0.5f) * DataGame.sizeBtn);
             if (typeStr != "player")
             {
                 cells[i, j] = btn.AddComponent<CellGame>();
@@ -88,7 +87,7 @@ public class Main : MonoBehaviour {
     public GameObject CreateGOcell()
     {
         GameObject cellGO = (GameObject)Instantiate(Resources.Load("Cell"), parent);
-        cellGO.GetComponent<RectTransform>().sizeDelta = sizeBtn;
+        cellGO.GetComponent<RectTransform>().sizeDelta = new Vector2(DataGame.sizeBtn, DataGame.sizeBtn);
         cellGO.transform.localScale = Vector3.one;
         return cellGO;
     }
