@@ -41,10 +41,20 @@ public class Main : MonoBehaviour {
                     q++;
                 }
             }
+
+        for (int i = 0; i < players.Count; i++)
+            players[i].gameObject.SetActive(false);
+        StartCoroutine(StartGame());
+    }
+
+    IEnumerator StartGame()
+    {
+        yield return new WaitForSeconds(DataGame.timeExit);
         for (int i = 0; i < players.Count; i++)
         {
-            KeyCode[] control = new KeyCode[7] { DataGame.key[i, 0], DataGame.key[i, 1], DataGame.key[i, 2], DataGame.key[i, 3], DataGame.key[i, 4], DataGame.key[i, 5],DataGame.key[i,6] };
-            players[i].StartEngine(PlayerPrefs.GetInt("move"), control, btnsAdd[i], btnsRem[i],textsPoint[i]);
+            KeyCode[] control = new KeyCode[7] { DataGame.key[i, 0], DataGame.key[i, 1], DataGame.key[i, 2], DataGame.key[i, 3], DataGame.key[i, 4], DataGame.key[i, 5], DataGame.key[i, 6] };
+            players[i].StartEngine(PlayerPrefs.GetInt("move"), control, btnsAdd[i], btnsRem[i], textsPoint[i]);
+            players[i].gameObject.SetActive(true);
         }
     }
 

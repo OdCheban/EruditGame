@@ -21,6 +21,15 @@ public class EditScene : MonoBehaviour {
     public Text inputX;
     public Text inputY;
     public Text inputWordResult;
+    public Text timeExit;
+    public Text timeGame;
+    public Text speed;
+    public Text speedVagon;
+    public Text speedConnect;
+    public Text speedDisconnect;
+    public Text xBonus;
+
+
     public Slider moveMode;
     private int x = 5 + 2;
     private int y = 5 + 2;
@@ -159,6 +168,15 @@ public class EditScene : MonoBehaviour {
         }
         PlayerPrefs.SetString("map", m);
         PlayerPrefs.SetString("words", inputWordResult.text);
+
+        PlayerPrefs.SetInt("timeExit", int.Parse(timeExit.text));
+        PlayerPrefs.SetInt("timeGame", int.Parse(timeGame.text));
+        PlayerPrefs.SetInt("speed", int.Parse(speed.text));
+        PlayerPrefs.SetInt("speedVagon", int.Parse(speedVagon.text));
+        PlayerPrefs.SetInt("speedConnect", int.Parse(speedConnect.text));
+        PlayerPrefs.SetInt("speedDisconnect", int.Parse(speedDisconnect.text));
+        PlayerPrefs.SetInt("xBonus", int.Parse(xBonus.text));
+
         PlayerPrefs.SetInt("x", x);
         PlayerPrefs.SetInt("y", y);
         PlayerPrefs.SetInt("move", (int)moveMode.value);

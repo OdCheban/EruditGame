@@ -29,6 +29,10 @@ public class Player : MonoBehaviour
     public enum MoveMode { Hard,Easy };
     public MoveMode moveMode;
     public float speed;
+    public float FullSpeed
+    {
+        get { return DataGame.speed - (playerCells.Count - 1) * DataGame.speedVagon; }
+    }
     public Vector2 velocity;
     bool move;
     Color myColor;
@@ -52,8 +56,8 @@ public class Player : MonoBehaviour
     {
         CreateArrow();
         myColor = color;
-        speed = DataGame.speed;
         playerCells.Add(CreateCell(typeStr,i,j));
+        speed = FullSpeed;
         StartVelocity(i,j);
     }
 
@@ -101,6 +105,7 @@ public class Player : MonoBehaviour
         {
             playerCells.RemoveAt(1);
         }
+        speed = FullSpeed;
     }
 
     void Update()
@@ -115,7 +120,11 @@ public class Player : MonoBehaviour
                 for(int i = 0; i < Main.instance.resultWords.Length;i++)
                     if(Main.instance.resultWords[i] == WordPlayer())
                     {
-                        score += WordPlayer().Length;
+                        for (int j = 1; j < playerCells.Count; j++)
+                        {
+                            score += DataGame.ABC[playerCells[j].str];
+                        }
+                        score += WordPlayer().Length * DataGame.xBonus;
                         RemovePlayerCells();
                     }
             }
@@ -140,10 +149,24 @@ public class Player : MonoBehaviour
     {
         if (playerCells.Count > 1)
         {
-            playerCells.Last().Disconnect();
-            playerCells.Remove(playerCells.Last());
-            UpdatePosArrow(playerHead.transform);
+            StartCoroutine(DisConnectAnimation());
         }
+    }
+    IEnumerator DisConnectAnimation()
+    {
+        processConnect = true;
+        btnRem.GetComponent<Image>().fillAmount = 0;
+        while (btnRem.GetComponent<Image>().fillAmount < 1.0f)
+        {
+            btnRem.GetComponent<Image>().fillAmount += (DataGame.speedDisconnect/1000);
+            yield return new WaitForEndOfFrame();
+        }
+        playerCells.Last().Disconnect();
+        playerCells.Remove(playerCells.Last());
+        speed = FullSpeed;
+        btnRem.interactable = (playerCells.Count > 1) ? true : false;
+        UpdatePosArrow(playerHead.transform);
+        processConnect = false;
     }
 
     IEnumerator ConnectAnimation()
@@ -152,10 +175,12 @@ public class Player : MonoBehaviour
         btnAdd.GetComponent<Image>().fillAmount = 0;
         while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
-            btnAdd.GetComponent<Image>().fillAmount += 0.01f;
+            btnAdd.GetComponent<Image>().fillAmount += (DataGame.speedConnect/1000);
             yield return new WaitForEndOfFrame();
         }
         playerCells.Add(playerHead.Connect(velocity));
+        speed = FullSpeed;
+        btnRem.interactable = (playerCells.Count > 1) ? true : false;
         UpdatePosArrow(playerHead.transform);
         processConnect = false;
     }
