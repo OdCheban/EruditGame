@@ -122,7 +122,7 @@ public class Player : MonoBehaviour
                     {
                         for (int j = 1; j < playerCells.Count; j++)
                         {
-                            score += DataGame.ABC[playerCells[j].str.ToLower()];
+                            score += DataGame.ABC[playerCells[j].str.ToLower()[0]];
                         }
                         score += WordPlayer().Length * DataGame.xBonus;
                         RemovePlayerCells();

@@ -46,14 +46,14 @@ public class EditScene : MonoBehaviour {
 
     int n;
     string s;//исходное слово
-    int[] a;
-    string[] mas;
-
+    List<int> a = new List<int>();
+    List<string> mas = new List<string>();
 
     //функция генерации подмножеств
     string next_pdm()
     {
-        string s1;
+        //string s1;
+        StringBuilder s1;
         int i;
         i = n;
         while (a[i] == 1)
@@ -62,11 +62,11 @@ public class EditScene : MonoBehaviour {
             i--;
         }
         a[i]++;
-        s1 = string.Empty;
+        s1 = new StringBuilder();
         for (i = 1; i <= n; i++)
             if (a[i] == 1)
-                s1 += s[i-1];
-        return s1;
+                s1.Append(s[i-1]);
+        return s1.ToString();
     }
 
     //генерация перестановок
@@ -75,10 +75,11 @@ public class EditScene : MonoBehaviour {
         StringBuilder s1 = new StringBuilder(s2);
         int i;
         char v;
+        if (r > 5) return;
         if (l == r)
         {
             m++;
-            mas[m] = s1.ToString();
+            mas.Add(s1.ToString());
         }
         else
         {
@@ -88,6 +89,7 @@ public class EditScene : MonoBehaviour {
                 s1[l] = s1[i-1];
                 s1[i-1] = v; //обмен s1[i],s1[l]
                 s2 = s1.ToString();
+                if (l + 1 > 5) return;
                 next_per(ref s2, l + 1, r, ref m); //вызов новой генерации
                 v = s1[l];
                 s1[l] = s1[i-1];
@@ -95,30 +97,36 @@ public class EditScene : MonoBehaviour {
             }
         }
     }
-
+        
+    
     List<string> mass = new List<string>();
     //печать массива
     void Print(int m)
     {
         for (int i = 0; i < m; i++)
+        {
+            if(mas[i].Length > 1)
             mass.Add(mas[i]);
+        }
     }
 
     void Hi(string ss)
     {
-        a = new int[100];
-        mas = new string[100];
+        mass.Clear();
+        a.Clear();
+        mas.Clear();
         string s1;
         int m = 0;
         s = ss;
         n = ss.Length;
+        a.Add(0);
         for (int i = 1; i <= n; i++)
-            a[i] = 0;
+            a.Add(0);
         a[n] = 1;
         while (a[0] == 0)
         {
             s1 = next_pdm();
-            next_per(ref s1, 1, s1.Length, ref m);
+            next_per(ref s1, 2, s1.Length, ref m);
         }
         Print(m);
     }
@@ -137,11 +145,14 @@ public class EditScene : MonoBehaviour {
     {
         Hi(StringCell().ToLower());
         HashSet<string> res = new HashSet<string>();
-        foreach (string r in DataGame.allWords)
-            foreach (string y in mass)
-                if (r == y)
-                    res.Add(y);
-
+        int k = 0;
+        for (int i = 0; i < mass.Count; i++)
+            foreach (string r in DataGame.allWords[mass[i][0]][mass[i][1]])
+            {
+                if (r == mass[i])
+                    res.Add(mass[i]);
+                k++;
+            }
         inputWordResultN.text = "N = " + res.Count;
         inputWordResult.text = "";
         foreach (string t in res)
@@ -156,6 +167,7 @@ public class EditScene : MonoBehaviour {
         ClearField();
         CreateField();
     }
+
 
     private void Awake()
     {

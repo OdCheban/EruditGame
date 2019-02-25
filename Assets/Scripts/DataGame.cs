@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
+
 public class DataGame : MonoBehaviour {
 
     private static int _x;
@@ -33,42 +34,43 @@ public class DataGame : MonoBehaviour {
     public static float xBonus;
     public static int sizeBtn = 60;
 
-    public static Dictionary<string,int> ABC = new Dictionary<string, int>() {
-        { "a", 1 },
-        { "б", 3 },
-        { "в", 2 },
-        { "г", 3 },
-        { "д", 2 },
-        { "е", 1 },
-        { "ж", 5 },
-        { "з", 5 },
-        { "и", 1 },
-        { "й", 2 },
-        { "к", 2 },
-        { "л", 2 },
-        { "м", 2 },
-        { "н", 1 },
-        { "о", 1 },
-        { "п", 2 },
-        { "р", 2 },
-        { "с", 2 },
-        { "т", 2 },
-        { "у", 3 },
-        { "ф", 10 },
-        { "х", 5 },
-        { "ц", 10 },
-        { "ч", 5 },
-        { "ш", 10 },
-        { "щ", 10 },
-        { "ъ", 10 },
-        { "ы", 5 },
-        { "ь", 5 },
-        { "э", 10 },
-        { "ю", 10 },
-        { "я", 3 },
+    public static Dictionary<char,int> ABC = new Dictionary<char, int>() {
+        { 'а', 1 },
+        { 'б', 3 },
+        { 'в', 2 },
+        { 'г', 3 },
+        { 'д', 2 },
+        { 'е', 1 },
+        { 'ж', 5 },
+        { 'з', 5 },
+        { 'и', 1 },
+        { 'й', 2 },
+        { 'к', 2 },
+        { 'л', 2 },
+        { 'м', 2 },
+        { 'н', 1 },
+        { 'о', 1 },
+        { 'п', 2 },
+        { 'р', 2 },
+        { 'с', 2 },
+        { 'т', 2 },
+        { 'у', 3 },
+        { 'ф', 10 },
+        { 'х', 5 },
+        { 'ц', 10 },
+        { 'ч', 5 },
+        { 'ш', 10 },
+        { 'щ', 10 },
+        { 'ъ', 10 },
+        { 'ы', 5 },
+        { 'ь', 5 },
+        { 'э', 10 },
+        { 'ю', 10 },
+        { 'я', 3 },
+        { 'ё', 15 }
     };
-    public static List<string> allWords = new List<string>();
-
+    //public static Dictionary<char,List<string>> allWords = new Dictionary<char, List<string>>();
+    public static Dictionary<char, Dictionary<char, List<string>>> allWords = new Dictionary<char, Dictionary<char, List<string>>>();
     public static bool ExitRange(int i, int j, int iMax = 0, int jMax = 0)
     {
         if (iMax == 0) { iMax = x; jMax = y; }
@@ -84,13 +86,22 @@ public class DataGame : MonoBehaviour {
 
     static void ReadDictonaryFromFile()
     {
-        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+        foreach (char value in ABC.Keys)
+            allWords.Add(value, new Dictionary<char, List<string>>());
+
+        foreach (char value in ABC.Keys)
+            foreach (char valuee in ABC.Keys)
+                allWords[value].Add(valuee, new List<string>());
+            StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+
         string sLine = "";
         while (sLine != null)
         {
             sLine = objReader.ReadLine();
-            if (sLine != null)
-                allWords.Add(sLine);
+            if (sLine != null && sLine.Length > 1)
+            {
+                allWords[sLine[0]][sLine[1]].Add(sLine);
+            }
         }
     }
 
