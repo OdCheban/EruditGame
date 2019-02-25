@@ -89,7 +89,6 @@ public class EditScene : MonoBehaviour {
                 s1[l] = s1[i-1];
                 s1[i-1] = v; //обмен s1[i],s1[l]
                 s2 = s1.ToString();
-                if (l + 1 > 5) return;
                 next_per(ref s2, l + 1, r, ref m); //вызов новой генерации
                 v = s1[l];
                 s1[l] = s1[i-1];

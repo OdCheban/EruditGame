@@ -84,7 +84,7 @@ public class DataGame : MonoBehaviour {
         return (i != 0 && j != 0) && (i < x - 1 && j < y - 1);
     }
 
-    static void ReadDictonaryFromFile()
+    public static void ReadDictonaryFromFile()
     {
         foreach (char value in ABC.Keys)
             allWords.Add(value, new Dictionary<char, List<string>>());
@@ -107,7 +107,6 @@ public class DataGame : MonoBehaviour {
 
     public static void LoadData()
     {
-        ReadDictonaryFromFile();
         x = PlayerPrefs.GetInt("x", 5);
         y = PlayerPrefs.GetInt("y", 5);
         modeMove = PlayerPrefs.GetInt("move", 0);

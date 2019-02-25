@@ -5,6 +5,7 @@ public class LoadData : MonoBehaviour {
 
 	void Start ()
     {
+        DataGame.ReadDictonaryFromFile();
         DataGame.LoadData();
         SceneManager.LoadScene("Menu");
     }
