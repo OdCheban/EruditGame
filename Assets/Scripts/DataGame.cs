@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -66,6 +67,8 @@ public class DataGame : MonoBehaviour {
         { "ю", 10 },
         { "я", 3 },
     };
+    public static List<string> allWords = new List<string>();
+
     public static bool ExitRange(int i, int j, int iMax = 0, int jMax = 0)
     {
         if (iMax == 0) { iMax = x; jMax = y; }
@@ -79,8 +82,21 @@ public class DataGame : MonoBehaviour {
         return (i != 0 && j != 0) && (i < x - 1 && j < y - 1);
     }
 
+    static void ReadDictonaryFromFile()
+    {
+        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+        string sLine = "";
+        while (sLine != null)
+        {
+            sLine = objReader.ReadLine();
+            if (sLine != null)
+                allWords.Add(sLine);
+        }
+    }
+
     public static void LoadData()
     {
+        ReadDictonaryFromFile();
         x = PlayerPrefs.GetInt("x", 5);
         y = PlayerPrefs.GetInt("y", 5);
         modeMove = PlayerPrefs.GetInt("move", 0);

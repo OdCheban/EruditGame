@@ -8,7 +8,11 @@ public class Cell : MonoBehaviour
     public enum TypeBtn { Default, Player, Abc }
     public TypeBtn type;
     public Text txt;
-
+    public string text
+    {
+        set { txt.text = value; }
+        get { return txt.text; }
+    }
     public void Create(TypeBtn type)
     {
         txt = transform.GetChild(0).GetComponent<Text>();
@@ -32,20 +36,22 @@ public class Cell : MonoBehaviour
     void SetValue(Cell fromTxt,Cell toTxt)
     {
         bool toPlayer = (toTxt.type == TypeBtn.Player && 
-            ((fromTxt.txt.text == "player" && EditScene.instance.kPlayers < 2) || fromTxt.txt.text == ""));
-        bool notToPlayer = (toTxt.type != TypeBtn.Player && (fromTxt.txt.text != "player"));
+            ((fromTxt.text == "player" && EditScene.instance.kPlayers < 2) || fromTxt.text == ""));
+        bool notToPlayer = (toTxt.type != TypeBtn.Player && (fromTxt.text != "player"));
         if (notToPlayer || toPlayer)
         {
             if (toPlayer)
             {
-                if (fromTxt.txt.text == "player" && toTxt.txt.text == "")
+                if (fromTxt.text == "player" && toTxt.text == "")
                     EditScene.instance.kPlayers++;
-                else if (fromTxt.txt.text == "" && toTxt.txt.text == "player")
+                else if (fromTxt.text == "" && toTxt.text== "player")
                     EditScene.instance.kPlayers--;
             }
-            toTxt.txt.text = fromTxt.txt.text;
-
+            toTxt.text = fromTxt.text;
         }
+
+        //выводим все буквы
+        EditScene.instance.CheckAvialWords();
     }
 
     public void UnClick()

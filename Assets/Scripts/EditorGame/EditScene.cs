@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Text;
 
 public class EditScene : MonoBehaviour {
 
@@ -21,6 +22,7 @@ public class EditScene : MonoBehaviour {
     public InputField inputX;
     public InputField inputY;
     public InputField inputWordResult;
+    public InputField inputWordResultN;
     public InputField timeExit;
     public InputField timeGame;
     public InputField speed;
@@ -41,6 +43,110 @@ public class EditScene : MonoBehaviour {
     public Cell lastBtnAbc;
 
     public int kPlayers;
+
+    int n;
+    string s;//исходное слово
+    int[] a;
+    string[] mas;
+
+
+    //функция генерации подмножеств
+    string next_pdm()
+    {
+        string s1;
+        int i;
+        i = n;
+        while (a[i] == 1)
+        {
+            a[i] = 0;
+            i--;
+        }
+        a[i]++;
+        s1 = string.Empty;
+        for (i = 1; i <= n; i++)
+            if (a[i] == 1)
+                s1 += s[i-1];
+        return s1;
+    }
+
+    //генерация перестановок
+    void next_per(ref string s2, int l, int r, ref int m)
+    {
+        StringBuilder s1 = new StringBuilder(s2);
+        int i;
+        char v;
+        if (l == r)
+        {
+            m++;
+            mas[m] = s1.ToString();
+        }
+        else
+        {
+            for (i = l; i <= r; i++)
+            {
+                v = s1[l];
+                s1[l] = s1[i-1];
+                s1[i-1] = v; //обмен s1[i],s1[l]
+                s2 = s1.ToString();
+                next_per(ref s2, l + 1, r, ref m); //вызов новой генерации
+                v = s1[l];
+                s1[l] = s1[i-1];
+                s1[i-1] = v; //обмен s1[i],s1[l]
+            }
+        }
+    }
+
+    List<string> mass = new List<string>();
+    //печать массива
+    void Print(int m)
+    {
+        for (int i = 0; i < m; i++)
+            mass.Add(mas[i]);
+    }
+
+    void Hi(string ss)
+    {
+        a = new int[100];
+        mas = new string[100];
+        string s1;
+        int m = 0;
+        s = ss;
+        n = ss.Length;
+        for (int i = 1; i <= n; i++)
+            a[i] = 0;
+        a[n] = 1;
+        while (a[0] == 0)
+        {
+            s1 = next_pdm();
+            next_per(ref s1, 1, s1.Length, ref m);
+        }
+        Print(m);
+    }
+
+    string StringCell()
+    {
+        string m = string.Empty;
+        foreach (Cell cell in cells)
+            if (cell.type == Cell.TypeBtn.Default && cell.text != "")
+                m += cell.text;
+        return m;
+    }
+
+
+    public void CheckAvialWords()
+    {
+        Hi(StringCell().ToLower());
+        HashSet<string> res = new HashSet<string>();
+        foreach (string r in DataGame.allWords)
+            foreach (string y in mass)
+                if (r == y)
+                    res.Add(y);
+
+        inputWordResultN.text = "N = " + res.Count;
+        inputWordResult.text = "";
+        foreach (string t in res)
+            inputWordResult.text += t + " ";
+    }
 
     public void EnterSize()
     {
