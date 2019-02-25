@@ -24,9 +24,8 @@ public class Cell : MonoBehaviour
         if (lastCell != null && lastAbc != null)
         {
             SetValue(lastAbc, lastCell);
-            lastAbc.UnClick();
             EditScene.instance.lastBtnCell.UnClick();
-            EditScene.instance.lastBtnAbc = EditScene.instance.lastBtnCell = null;
+            EditScene.instance.lastBtnCell = null;
         }
     }
 

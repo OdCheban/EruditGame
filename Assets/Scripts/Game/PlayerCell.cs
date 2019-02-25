@@ -20,13 +20,21 @@ public class PlayerCell : CellGame
 
     void MoveTo(int i, int j, float speed)
     {
-        position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
+        if (DataGame.ExitRangeGame(i,j))
+        {
+            position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
+        }
     }
 
     public bool hasArrived()
     {
-        float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
-        return (dist < 0.1f);
+        if (DataGame.ExitRangeGame(iTarget, jTarget))
+        {
+            float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
+            return (dist < 0.1f);
+        }
+        else
+            return false;
     }
 
     public bool CheckArrive(Vector2 velocity,Player.MoveMode moveMode)
