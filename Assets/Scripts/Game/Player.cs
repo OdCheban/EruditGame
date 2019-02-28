@@ -82,8 +82,8 @@ public class Player : MonoBehaviour
         this.key = key;
 
         transform.SetAsLastSibling();
-        playerHead.NextCell(velocity);
-        move = true;
+        //playerHead.NextCell(velocity);
+        //move = true;
     }
     string WordPlayer()
     {
@@ -122,7 +122,7 @@ public class Player : MonoBehaviour
                     {
                         for (int j = 1; j < playerCells.Count; j++)
                         {
-                            score += DataGame.ABC[playerCells[j].str.ToLower()[0]];
+                            score += DataGame.ABCscore[playerCells[j].str.ToLower()[0]];
                         }
                         score += WordPlayer().Length * DataGame.xBonus;
                         RemovePlayerCells();
@@ -142,6 +142,7 @@ public class Player : MonoBehaviour
 
     public void Connect()
     {
+        move = false;
         StartCoroutine(ConnectAnimation());
     }
 
@@ -149,6 +150,7 @@ public class Player : MonoBehaviour
     {
         if (playerCells.Count > 1)
         {
+            move = false;   
             StartCoroutine(DisConnectAnimation());
         }
     }
@@ -226,8 +228,7 @@ public class Player : MonoBehaviour
 
     void Controll()
     {
-        if (((playerHead.hasArrived() && moveMode == MoveMode.Easy) || moveMode == MoveMode.Hard) && 
-            (Input.GetKeyDown(key[0]) || Input.GetKeyDown(key[1]) || Input.GetKeyDown(key[2]) || Input.GetKeyDown(key[3])))
+        if (Input.GetKeyDown(key[0]) || Input.GetKeyDown(key[1]) || Input.GetKeyDown(key[2]) || Input.GetKeyDown(key[3]))
         {
             if (Input.GetKeyDown(key[0]))
             {
@@ -253,8 +254,7 @@ public class Player : MonoBehaviour
                     velocity = new Vector2(0, 1);
                 else return;
             }
-
-            if (moveMode == MoveMode.Easy)
+            if(!move)
                 playerHead.NextCell(velocity);
             move = true;
         }

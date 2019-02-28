@@ -20,10 +20,9 @@ public class PlayerCell : CellGame
 
     void MoveTo(int i, int j, float speed)
     {
-        if (DataGame.ExitRangeGame(i,j))
-        {
+     
             position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
-        }
+    
     }
 
     public bool hasArrived()
@@ -49,8 +48,7 @@ public class PlayerCell : CellGame
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
                 arrive = (Main.instance.cells[nextI, nextJ].isAbc) ? true : false;
-                if (moveMode == Player.MoveMode.Hard)
-                    NextCell(velocity);
+                NextCell(velocity);
             }
         }
         return arrive;

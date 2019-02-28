@@ -32,9 +32,9 @@ public class DataGame : MonoBehaviour {
     public static float speedConnect;
     public static float speedDisconnect;
     public static float xBonus;
-    public static int sizeBtn = 60;
+    public static int sizeBtn = 70;
 
-    public static Dictionary<char,int> ABC = new Dictionary<char, int>() {
+    public static Dictionary<char,int> ABCscore = new Dictionary<char, int>() {
         { 'а', 1 },
         { 'б', 3 },
         { 'в', 2 },
@@ -69,8 +69,7 @@ public class DataGame : MonoBehaviour {
         { 'я', 3 },
         { 'ё', 15 }
     };
-    //public static Dictionary<char,List<string>> allWords = new Dictionary<char, List<string>>();
-    public static Dictionary<char, Dictionary<char, List<string>>> allWords = new Dictionary<char, Dictionary<char, List<string>>>();
+    public static List<string> abc = new List<string>();
     public static bool ExitRange(int i, int j, int iMax = 0, int jMax = 0)
     {
         if (iMax == 0) { iMax = x; jMax = y; }
@@ -86,13 +85,7 @@ public class DataGame : MonoBehaviour {
 
     public static void ReadDictonaryFromFile()
     {
-        foreach (char value in ABC.Keys)
-            allWords.Add(value, new Dictionary<char, List<string>>());
-
-        foreach (char value in ABC.Keys)
-            foreach (char valuee in ABC.Keys)
-                allWords[value].Add(valuee, new List<string>());
-            StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
 
         string sLine = "";
         while (sLine != null)
@@ -100,7 +93,7 @@ public class DataGame : MonoBehaviour {
             sLine = objReader.ReadLine();
             if (sLine != null && sLine.Length > 1)
             {
-                allWords[sLine[0]][sLine[1]].Add(sLine);
+                abc.Add(sLine);
             }
         }
     }
@@ -117,7 +110,7 @@ public class DataGame : MonoBehaviour {
         speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
         speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
         xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
-        abcResult = PlayerPrefs.GetString("words", "слова мяч огонь вода яд").Split(' ','\n').ToList();
+        abcResult = PlayerPrefs.GetString("words", "").Split(' ','\n').ToList();
         string m = PlayerPrefs.GetString("map", "");
         if (m == "")
         {

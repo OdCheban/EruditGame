@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Text;
+using System.Text.RegularExpressions;
 
 public class EditScene : MonoBehaviour {
 
@@ -21,7 +22,7 @@ public class EditScene : MonoBehaviour {
 
     public InputField inputX;
     public InputField inputY;
-    public InputField inputWordResult;
+    private string inputWordResult;
     public InputField inputWordResultN;
     public InputField timeExit;
     public InputField timeGame;
@@ -44,92 +45,6 @@ public class EditScene : MonoBehaviour {
 
     public int kPlayers;
 
-    int n;
-    string s;//исходное слово
-    List<int> a = new List<int>();
-    List<string> mas = new List<string>();
-
-    //функция генерации подмножеств
-    string next_pdm()
-    {
-        //string s1;
-        StringBuilder s1;
-        int i;
-        i = n;
-        while (a[i] == 1)
-        {
-            a[i] = 0;
-            i--;
-        }
-        a[i]++;
-        s1 = new StringBuilder();
-        for (i = 1; i <= n; i++)
-            if (a[i] == 1)
-                s1.Append(s[i-1]);
-        return s1.ToString();
-    }
-
-    //генерация перестановок
-    void next_per(ref string s2, int l, int r, ref int m)
-    {
-        StringBuilder s1 = new StringBuilder(s2);
-        int i;
-        char v;
-        if (r > 5) return;
-        if (l == r)
-        {
-            m++;
-            mas.Add(s1.ToString());
-        }
-        else
-        {
-            for (i = l; i <= r; i++)
-            {
-                v = s1[l];
-                s1[l] = s1[i-1];
-                s1[i-1] = v; //обмен s1[i],s1[l]
-                s2 = s1.ToString();
-                next_per(ref s2, l + 1, r, ref m); //вызов новой генерации
-                v = s1[l];
-                s1[l] = s1[i-1];
-                s1[i-1] = v; //обмен s1[i],s1[l]
-            }
-        }
-    }
-        
-    
-    List<string> mass = new List<string>();
-    //печать массива
-    void Print(int m)
-    {
-        for (int i = 0; i < m; i++)
-        {
-            if(mas[i].Length > 1)
-            mass.Add(mas[i]);
-        }
-    }
-
-    void Hi(string ss)
-    {
-        mass.Clear();
-        a.Clear();
-        mas.Clear();
-        string s1;
-        int m = 0;
-        s = ss;
-        n = ss.Length;
-        a.Add(0);
-        for (int i = 1; i <= n; i++)
-            a.Add(0);
-        a[n] = 1;
-        while (a[0] == 0)
-        {
-            s1 = next_pdm();
-            next_per(ref s1, 2, s1.Length, ref m);
-        }
-        Print(m);
-    }
-
     string StringCell()
     {
         string m = string.Empty;
@@ -139,23 +54,29 @@ public class EditScene : MonoBehaviour {
         return m;
     }
 
-
     public void CheckAvialWords()
     {
-        Hi(StringCell().ToLower());
-        HashSet<string> res = new HashSet<string>();
+        StringBuilder str = new StringBuilder();
+        string letters = StringCell().ToLower();
         int k = 0;
-        for (int i = 0; i < mass.Count; i++)
-            foreach (string r in DataGame.allWords[mass[i][0]][mass[i][1]])
+        foreach (var word in DataGame.abc)
+        {
+            var isFound = true;
+
+            foreach (var letter in word)
             {
-                if (r == mass[i])
-                    res.Add(mass[i]);
-                k++;
+                if (!letters.Contains(letter.ToString()))
+                    isFound = false;
             }
-        inputWordResultN.text = "N = " + res.Count;
-        inputWordResult.text = "";
-        foreach (string t in res)
-            inputWordResult.text += t + " ";
+
+            if (isFound)
+            {
+                k++;
+                str.Append(word + " ");
+            }
+        }
+        inputWordResult = str.ToString();
+        inputWordResultN.text = "N = " + k.ToString();
     }
 
     public void EnterSize()
@@ -231,9 +152,9 @@ public class EditScene : MonoBehaviour {
     }
     private void LoadSettings()
     {
+        inputWordResult = string.Join(" ", DataGame.abcResult.ToArray());
         inputX.text = DataGame.x.ToString();
         inputY.text = DataGame.y.ToString();
-        inputWordResult.text = string.Join(" ", DataGame.abcResult.ToArray());
         timeExit.text = DataGame.timeExit.ToString();
         timeGame.text = DataGame.timeGame.ToString();
         speed.text = DataGame.speed.ToString();
@@ -293,7 +214,8 @@ public class EditScene : MonoBehaviour {
     }
     void SaveMap()
     {
-        PlayerPrefs.SetString("words", inputWordResult.text);
+        DataGame.abcResult = new List<string>(inputWordResult.Split(' '));
+        PlayerPrefs.SetString("words", inputWordResult);
         PlayerPrefs.SetFloat("timeExit", float.Parse(timeExit.text));
         PlayerPrefs.SetFloat("timeGame", float.Parse(timeGame.text));
         PlayerPrefs.SetFloat("speed", float.Parse(speed.text));

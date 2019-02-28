@@ -68,7 +68,7 @@ public class Main : MonoBehaviour {
         if (typeStr != "null")
         {
             GameObject btn = CreateGOcell();
-            Vector2 offset = new Vector2(-DataGame.x * 60 / 2, DataGame.y * 60 / 2);
+            Vector2 offset = new Vector2(-DataGame.x * DataGame.sizeBtn  / 2, DataGame.y * DataGame.sizeBtn / 2);
             btn.transform.localPosition = offset + new Vector2((i+0.5f) * DataGame.sizeBtn, -(j+0.5f) * DataGame.sizeBtn);
             if (typeStr != "player")
             {
