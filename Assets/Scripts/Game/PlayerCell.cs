@@ -47,7 +47,7 @@ public class PlayerCell : CellGame
             jPos = jTarget;
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
-                arrive = (Main.instance.cells[nextI, nextJ].isAbc) ? true : false;
+                arrive = (Main.instance.cells[nextI, nextJ].isAbc && !Main.instance.cells[nextI, nextJ].connectProcess) ? true : false;
                 NextCell(velocity);
             }
         }

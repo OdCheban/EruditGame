@@ -175,12 +175,16 @@ public class Player : MonoBehaviour
     {
         processConnect = true;
         btnAdd.GetComponent<Image>().fillAmount = 0;
+        int nextI = playerHead.iTarget + (int)velocity.x;
+        int nextJ = playerHead.jTarget + (int)velocity.y;
+        Main.instance.cells[nextI, nextJ].connectProcess = true;
         while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
             btnAdd.GetComponent<Image>().fillAmount += DataGame.speedConnect;
             yield return new WaitForEndOfFrame();
         }
         playerCells.Add(playerHead.Connect(velocity));
+        Main.instance.cells[nextI, nextJ].connectProcess = false;
         speed = FullSpeed;
         btnRem.interactable = (playerCells.Count > 1) ? true : false;
         UpdatePosArrow(playerHead.transform);

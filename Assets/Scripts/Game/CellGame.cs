@@ -20,6 +20,7 @@ public class CellGame : MonoBehaviour {
         get { return (str != "wall" && str != ""); }
     }
     private Text txt;
+    public bool connectProcess;
 
     private void Awake()
     {
