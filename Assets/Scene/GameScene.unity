@@ -341,10 +341,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 90
+    m_FontSize: 80
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 8
     m_MaxSize: 90
     m_Alignment: 5
     m_AlignByGeometry: 0
@@ -1608,7 +1608,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1120971819}
-  sizeBtn: {x: 60, y: 60}
   players: []
   btnsAdd:
   - {fileID: 1516897233}
@@ -1620,6 +1619,7 @@ MonoBehaviour:
   - {fileID: 1619999950}
   - {fileID: 485781991}
   readyGame: {fileID: 529327851}
+  scale: 0
 --- !u!4 &1534100527
 Transform:
   m_ObjectHideFlags: 0
@@ -1715,10 +1715,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 90
+    m_FontSize: 80
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 8
     m_MaxSize: 90
     m_Alignment: 3
     m_AlignByGeometry: 0
