@@ -14,7 +14,7 @@ public class Main : MonoBehaviour {
     public Button[] btnsRem;
     public Text[] textsPoint;
     public GameObject readyGame;
-
+    [HideInInspector] public float scale;
     private void Awake()
     {
         instance = this;
@@ -60,7 +60,8 @@ public class Main : MonoBehaviour {
     void ScaleParent()
     {
         float max = Mathf.Max(DataGame.x, DataGame.y);
-        parent.localScale = new Vector2(15.0f / max, 15.0f / max);
+        scale = 15.0f / max;
+        parent.localScale = new Vector2(scale, scale);
     }
 
     void CreateCell(int i, int j,string typeStr)

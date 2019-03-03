@@ -17,6 +17,7 @@ public class Timer : MonoBehaviour {
         if (timer <= 0)
         {
             ControlScene.instance.EndGame();
+            enabled = false;
         }
     }
 }

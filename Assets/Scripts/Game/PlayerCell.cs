@@ -20,9 +20,13 @@ public class PlayerCell : CellGame
 
     void MoveTo(int i, int j, float speed)
     {
-     
+        try
+        {
             position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
-    
+        }catch
+        {
+            player.move = false;
+        }
     }
 
     public bool hasArrived()
@@ -35,7 +39,7 @@ public class PlayerCell : CellGame
         else
             return false;
     }
-
+    float last = 0;
     public bool CheckArrive(Vector2 velocity,Player.MoveMode moveMode)
     {
         bool arrive = false;
@@ -47,7 +51,9 @@ public class PlayerCell : CellGame
             jPos = jTarget;
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
+                last = Time.fixedTime;
                 arrive = (Main.instance.cells[nextI, nextJ].isAbc && !Main.instance.cells[nextI, nextJ].connectProcess) ? true : false;
+                if(player.move)
                 NextCell(velocity);
             }
         }

@@ -28,13 +28,15 @@ public class Player : MonoBehaviour
     //характеристики поезда
     public enum MoveMode { Hard,Easy };
     public MoveMode moveMode;
-    public float speed;
-    public float FullSpeed
+    public float speed
     {
-        get { return Mathf.Clamp((DataGame.sizeBtn* DataGame.speed) - (playerCells.Count - 1) * (DataGame.speedVagon * DataGame.sizeBtn), 0, float.MaxValue); }
+        get
+        {
+            return (DataGame.sizeBtn*Main.instance.scale) / (DataGame.speed + (playerCells.Count-1)*DataGame.speedVagon);
+        }
     }
     public Vector2 velocity;
-    bool move;
+    public bool move;
     Color myColor;
 
     //игровые переменные
@@ -57,7 +59,6 @@ public class Player : MonoBehaviour
         CreateArrow();
         myColor = color;
         playerCells.Add(CreateCell(typeStr,i,j));
-        speed = FullSpeed;
         StartVelocity(i,j);
     }
 
@@ -82,8 +83,6 @@ public class Player : MonoBehaviour
         this.key = key;
 
         transform.SetAsLastSibling();
-        //playerHead.NextCell(velocity);
-        //move = true;
     }
     string WordPlayer()
     {
@@ -105,7 +104,6 @@ public class Player : MonoBehaviour
         {
             playerCells.RemoveAt(1);
         }
-        speed = FullSpeed;
     }
 
     void Update()
@@ -113,25 +111,21 @@ public class Player : MonoBehaviour
         if(!processConnect)
             Controll();
         if (move)
-        {
             MovePlayer();
-            if(playerHead.ExitABC())
-            {
-                foreach(string resultWords in DataGame.abcResult)
-                    if(resultWords == WordPlayer())
+        connectIf = playerHead.CheckArrive(velocity, moveMode);
+        btnAdd.interactable = connectIf;
+
+        if (playerHead.ExitABC())
+            foreach (string resultWords in DataGame.abcResult)
+                if (resultWords == WordPlayer())
+                {
+                    for (int j = 1; j < playerCells.Count; j++)
                     {
-                        for (int j = 1; j < playerCells.Count; j++)
-                        {
-                            score += DataGame.ABCscore[playerCells[j].str.ToLower()[0]];
-                        }
-                        score += WordPlayer().Length * DataGame.xBonus;
-                        RemovePlayerCells();
+                        score += DataGame.ABCscore[playerCells[j].str.ToLower()[0]];
                     }
-            }
-            
-            connectIf = playerHead.CheckArrive(velocity,moveMode);
-            btnAdd.interactable = connectIf;
-        }
+                    score += WordPlayer().Length * DataGame.xBonus;
+                    RemovePlayerCells();
+                }
     }
 
     void MovePlayer()
@@ -150,7 +144,6 @@ public class Player : MonoBehaviour
     {
         if (playerCells.Count > 1)
         {
-            move = false;   
             StartCoroutine(DisConnectAnimation());
         }
     }
@@ -165,7 +158,6 @@ public class Player : MonoBehaviour
         }
         playerCells.Last().Disconnect();
         playerCells.Remove(playerCells.Last());
-        speed = FullSpeed;
         btnRem.interactable = (playerCells.Count > 1) ? true : false;
         UpdatePosArrow(playerHead.transform);
         processConnect = false;
@@ -185,7 +177,6 @@ public class Player : MonoBehaviour
         }
         playerCells.Add(playerHead.Connect(velocity));
         Main.instance.cells[nextI, nextJ].connectProcess = false;
-        speed = FullSpeed;
         btnRem.interactable = (playerCells.Count > 1) ? true : false;
         UpdatePosArrow(playerHead.transform);
         processConnect = false;
