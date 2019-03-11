@@ -7,11 +7,15 @@ public class Menu : MonoBehaviour {
     {
         GUI.Label(new Rect(10, 10, 1000, 20), Application.dataPath);
     }
-    public void StartGame()
+    public void OpenOnGame()
     {
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("OnGameScene");
     }
-    public void StartEdit()
+    public void OpenOfGame()
+    {
+        SceneManager.LoadScene("OfGameScene");
+    }
+    public void OpenEdit()
     {
         SceneManager.LoadScene("EditScene");
     }

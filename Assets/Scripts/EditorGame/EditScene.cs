@@ -131,12 +131,12 @@ public class EditScene : MonoBehaviour {
         {
             for (int j = 0; j < y; j++)
             {
-                if (DataGame.ExitRange(i, j,x,y))
-                {
+                //if (DataGame.ExitRange(i, j,x,y))
+                
                     bool whoIs = ((j == y - 1) || (j == 0) || (i == x - 1) || (i == 0));
                     Cell.TypeBtn who = (whoIs) ? Cell.TypeBtn.Player : Cell.TypeBtn.Default;
                     CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), who);
-                }
+                
             }
         }
     }
@@ -172,13 +172,13 @@ public class EditScene : MonoBehaviour {
             int iY = 0; 
             for (int j = 0; j < DataGame.y; j++)
             {
-                if (DataGame.ExitRange(i, j, x, y))
-                {
+                //if (DataGame.ExitRange(i, j, x, y))
+                //{
                     bool whoIs = ((j == y - 1) || (j == 0) || (i == x - 1) || (i == 0));
                     Cell.TypeBtn who = (whoIs) ? Cell.TypeBtn.Player : Cell.TypeBtn.Default;
                     CreateBtn(startPos - new Vector2(size.x * i * -1, size.y * j), who,DataGame.map[i][iY]);
                     iY++;
-                }
+                //}
             }
         }
     }
@@ -249,7 +249,7 @@ public class EditScene : MonoBehaviour {
                 switch (cell.txt.text)
                 {
                     case "":
-                        m += "null ";
+                        m += "cell ";
                         break;
                     case "player":
                         m += "player ";
@@ -266,6 +266,6 @@ public class EditScene : MonoBehaviour {
     }
     public void Menu()
     {
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene("MenuScene");
     } 
 }

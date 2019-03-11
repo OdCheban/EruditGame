@@ -22,7 +22,7 @@ public class PlayerCell : CellGame
     {
         try
         {
-            position = Vector2.MoveTowards(position, Main.instance.cells[i, j].position, speed * Time.deltaTime);
+            position = Vector2.MoveTowards(position, MapOffline.instance.cells[i, j].position, speed * Time.deltaTime);
         }catch
         {
             player.move = false;
@@ -33,7 +33,7 @@ public class PlayerCell : CellGame
     {
         if (DataGame.ExitRangeGame(iTarget, jTarget))
         {
-            float dist = Vector2.Distance(position, Main.instance.cells[iTarget, jTarget].position);
+            float dist = Vector2.Distance(position, MapOffline.instance.cells[iTarget, jTarget].position);
             return (dist < 0.1f);
         }
         else
@@ -52,7 +52,7 @@ public class PlayerCell : CellGame
             if (DataGame.ExitRangeGame(nextI, nextJ))
             {
                 last = Time.fixedTime;
-                arrive = (Main.instance.cells[nextI, nextJ].isAbc && !Main.instance.cells[nextI, nextJ].connectProcess) ? true : false;
+                arrive = (MapOffline.instance.cells[nextI, nextJ].isAbc && !MapOffline.instance.cells[nextI, nextJ].connectProcess) ? true : false;
                 if(player.move)
                 NextCell(velocity);
             }
@@ -86,7 +86,7 @@ public class PlayerCell : CellGame
                 MoveCell(player.speed);
             else
             {
-                Main.instance.cells[iTarget, jTarget].SetValue(str);
+                MapOffline.instance.cells[iTarget, jTarget].SetValue(str);
                 Destroy(gameObject);
             }
         }
@@ -97,8 +97,8 @@ public class PlayerCell : CellGame
     {
         int nextI = iTarget + (int)velocity.x;
         int nextJ = jTarget + (int)velocity.y;
-        string nameCell = Main.instance.cells[nextI, nextJ].str;
-        Main.instance.cells[nextI, nextJ].Clear();
+        string nameCell = MapOffline.instance.cells[nextI, nextJ].str;
+        MapOffline.instance.cells[nextI, nextJ].Clear();
         OccupTo(nextI, nextJ);
         return CreateVagon(nameCell, nextI, nextJ);
     }
@@ -106,20 +106,20 @@ public class PlayerCell : CellGame
     PlayerCell CreateVagon(string str,int i, int j)
     {
         PlayerCell newVagon = player.CreateCell(str, i, j);
-        newVagon.transform.localPosition = Main.instance.cells[i, j].transform.localPosition;
+        newVagon.transform.localPosition = MapOffline.instance.cells[i, j].transform.localPosition;
         return newVagon;
     }
 
     void OccupTo(int i, int j)
     {
-        Main.instance.cells[i, j].Occup();
+        MapOffline.instance.cells[i, j].Occup();
     }
 
     public void DestroyCell()
     {
         iPos = iTarget;
         jPos = jTarget;
-        Main.instance.cells[iPos, jPos].Leave();
+        MapOffline.instance.cells[iPos, jPos].Leave();
         Destroy(gameObject);
     }
 
@@ -130,8 +130,8 @@ public class PlayerCell : CellGame
         {
             prev.LeaveTo(prev.iTarget, prev.jTarget);
         }
-        if (DataGame.ExitRangeGame(i, j) && Main.instance.cells[i, j] != this )
-            Main.instance.cells[i, j].Leave();
+        if (DataGame.ExitRangeGame(i, j) && MapOffline.instance.cells[i, j] != this )
+            MapOffline.instance.cells[i, j].Leave();
     }
 
     public void FollowMe(int iTo, int jTo)
@@ -154,7 +154,7 @@ public class PlayerCell : CellGame
         int nextJ = jTarget + (int)velocity.y;
         if (DataGame.ExitRangeGame(nextI, nextJ))
         {
-            if (!Main.instance.cells[nextI, nextJ].occup)
+            if (!MapOffline.instance.cells[nextI, nextJ].occup)
             {
                 LeaveTo(iPos, jPos);
                 PlayerCell prev = player.getPrev(this);

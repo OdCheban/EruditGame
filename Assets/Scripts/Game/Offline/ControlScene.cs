@@ -17,14 +17,14 @@ public class ControlScene : MonoBehaviour {
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-            SceneManager.LoadScene("Menu");
+            SceneManager.LoadScene("MenuScene");
     }
     public void EndGame()
     {
         Time.timeScale = 0;
         string strResult = "";
         List<Player> winPlayers = new List<Player>();
-        foreach (Player player in Main.instance.players)
+        foreach (Player player in MapOffline.instance.players)
         {
             if (winPlayers.Count == 0 || player.score > winPlayers[0].score)
             {

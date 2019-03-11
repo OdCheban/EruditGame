@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return (DataGame.sizeBtn*Main.instance.scale) / (DataGame.speed + (playerCells.Count-1)*DataGame.speedVagon);
+            return (DataGame.sizeBtn*MapOffline.instance.scale) / (DataGame.speed + (playerCells.Count-1)*DataGame.speedVagon);
         }
     }
     public Vector2 velocity;
@@ -169,14 +169,14 @@ public class Player : MonoBehaviour
         btnAdd.GetComponent<Image>().fillAmount = 0;
         int nextI = playerHead.iTarget + (int)velocity.x;
         int nextJ = playerHead.jTarget + (int)velocity.y;
-        Main.instance.cells[nextI, nextJ].connectProcess = true;
+        MapOffline.instance.cells[nextI, nextJ].connectProcess = true;
         while (btnAdd.GetComponent<Image>().fillAmount < 1.0f)
         {
             btnAdd.GetComponent<Image>().fillAmount += DataGame.speedConnect;
             yield return new WaitForEndOfFrame();
         }
         playerCells.Add(playerHead.Connect(velocity));
-        Main.instance.cells[nextI, nextJ].connectProcess = false;
+        MapOffline.instance.cells[nextI, nextJ].connectProcess = false;
         btnRem.interactable = (playerCells.Count > 1) ? true : false;
         UpdatePosArrow(playerHead.transform);
         processConnect = false;
@@ -208,16 +208,16 @@ public class Player : MonoBehaviour
      
     public PlayerCell CreateCell(string typeStr, int i, int j)
     {
-        PlayerCell cell;
-        if (playerCells.Count == 0)
-            cell = gameObject.AddComponent<PlayerCell>();
-        else
-        {
-            GameObject newCell = Main.instance.CreateGOcell();
-            cell = newCell.AddComponent<PlayerCell>();
-        }
-        cell.Create(typeStr,i,j,this);
-        cell.gameObject.GetComponent<Image>().color = myColor;
+        PlayerCell cell = gameObject.AddComponent<PlayerCell>();
+        //if (playerCells.Count == 0)
+        //    cell = gameObject.AddComponent<PlayerCell>();
+        //else
+        //{
+        //    GameObject newCell = Main.CreateGOcell(Main.instance.parent);
+        //    cell = newCell.AddComponent<PlayerCell>();
+        //}
+        //cell.Create(typeStr,i,j,this);
+        //cell.gameObject.GetComponent<Image>().color = myColor;
         return cell;
     }
 

@@ -6,12 +6,25 @@ using UnityEngine;
 
 
 public class DataGame : MonoBehaviour {
-
+    public static bool loadData;
     private static int _x;
     private static int _y;
     public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
     public static KeyCode[,] key = new KeyCode[2,7] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X,KeyCode.Q },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M,KeyCode.Space } };
 
+    public static string str_map
+    {
+        get
+        {
+            string str = "";
+            foreach(List<string> lst in map)
+            {
+                foreach (string s in lst)
+                    str += s + " ";
+            }
+            return str;
+        }
+    }
     public static List<List<string>> map;
     public static List<string> abcResult;
     public static int y
@@ -85,17 +98,16 @@ public class DataGame : MonoBehaviour {
 
     public static void ReadDictonaryFromFile()
     {
-        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
-
-        string sLine = "";
-        while (sLine != null)
-        {
-            sLine = objReader.ReadLine();
-            if (sLine != null && sLine.Length > 1)
-            {
-                abc.Add(sLine);
-            }
-        }
+        //StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+        //string sLine = "";
+        //while (sLine != null)
+        //{
+        //    sLine = objReader.ReadLine();
+        //    if (sLine != null && sLine.Length > 1)
+        //    {
+        //        abc.Add(sLine);
+        //    }
+        //}
     }
 
     public static void LoadData()
@@ -127,26 +139,30 @@ public class DataGame : MonoBehaviour {
         }
         else
         {
-            string[] mm = m.Split(' ');
-            List<List<string>> m_map = new List<List<string>>();
-            int k = 0;
-            for (int i = 0; i < x; i++)
-            {
-                List<string> str = new List<string>();
-                for (int j = 0; j < y; j++)
-                {
-                    if (ExitRange(i, j, x, y))
-                    {
-                        str.Add(mm[k]);
-                        k++;
-                    }
-                }
-                m_map.Add(str);
-            }
-            map = m_map;
-
-
+            map = StrToListMap(m,x,y);
         }
+        DataGame.loadData = true;
+    }
+
+    public static List<List<string>> StrToListMap(string str,int x, int y)
+    {
+        string[] mm = str.Split(' ');
+        List<List<string>> m_map = new List<List<string>>();
+        int k = 0;
+        for (int i = 0; i < x; i++)
+        {
+            List<string> strLine = new List<string>();
+            for (int j = 0; j < y; j++)
+            {
+                //if (ExitRange(i, j, x, y))
+                //{
+                    strLine.Add(mm[k]);
+                    k++;
+                //}
+            }
+            m_map.Add(strLine);
+        }
+        return m_map;
     }
 
 }
