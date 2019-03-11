@@ -53,7 +53,7 @@ public class Map : MonoBehaviour {
         }
     }
 
-    public static void RefreshPosition(GameObject[,] mas,Transform parent, int width,int height,int sizeBtn)
+    public static void RefreshPosition(CellGame[,] mas,Transform parent, int width,int height,int sizeBtn)
     {
         for (int i = 0; i < width; i++)
         {

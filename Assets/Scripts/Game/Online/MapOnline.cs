@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -12,6 +13,17 @@ public struct LoadDataNet
     public string map;
 }
 
+[System.Serializable]
+public struct CellOnline
+{
+    public int x;
+    public int y;
+    public string map;
+}
+
+public class SyncListCell: SyncListStruct<CellGam>
+{
+}
 
 public class MapOnline : NetworkBehaviour
 {
@@ -20,7 +32,8 @@ public class MapOnline : NetworkBehaviour
     [SyncVar] public float scale;
 
     public Transform parent;
-    GameObject[,] mapClone;
+    public SyncListCell mapCell;
+    public CellGame[,] mapSc;
 
     private void Awake()
     {
@@ -41,33 +54,42 @@ public class MapOnline : NetworkBehaviour
     [Command]
     public void CmdCreateMap()
     {
-        mapClone = new GameObject[loadData.x, loadData.y];
         List<List<string>> map = DataGame.StrToListMap(loadData.map, loadData.x, loadData.y);
-        CellGame[,] mapSc = Map.CreateMap(loadData.x, loadData.y, 70, map, CustomNetManager.instance.CreateGOonlineCell);
+        mapSc = Map.CreateMap(loadData.x, loadData.y, 70, map, CustomNetManager.instance.CreateGOonlineCell);
+
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
-                mapClone[i, j] = mapSc[i, j].gameObject;
-
+            {
+                CellGam cell = new CellGam();
+                cell.str = mapSc[i, j].cellData.str;
+                mapCell.Add(cell);
+            }
         scale = Map.ScaleParent(parent, loadData.x, loadData.y);
-        Map.RefreshPosition(mapClone, parent, loadData.x, loadData.y, 70);
+        Map.RefreshPosition(mapSc, parent, loadData.x, loadData.y, 70);
     }
 
     [Command]
     public void CmdGetMap()
     {
         NetworkConnection target = NetworkServer.connections[NetworkServer.connections.Count - 1];
+        int k = 0;
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
-                TargetGetMap(target, mapClone[i, j], i, j);
+            {
+                TargetGetMap(target, mapSc[i, j].gameObject, i, j, k);
+                k++;
+            }
         TargetGetParent(target, parent.gameObject);
         TargetPosMap(target);
     }
 
     [TargetRpc]
-    void TargetGetMap(NetworkConnection target, GameObject cell,int i, int j)
+    void TargetGetMap(NetworkConnection target, GameObject cell,int i, int j,int k)
     {
-        if(i==0 && j ==0) mapClone = new GameObject[loadData.x, loadData.y];
-        mapClone[i, j] = cell;
+        if (i == 0 && j == 0) mapSc = new CellGame[loadData.x, loadData.y];
+        CellGame cellGame = cell.AddComponent<CellGame>();
+        cellGame.GetData(mapCell[k]);
+        mapSc[i, j] = cellGame;
     }
 
     [TargetRpc]
@@ -80,13 +102,13 @@ public class MapOnline : NetworkBehaviour
     void TargetPosMap(NetworkConnection target)
     {
         parent.localScale = new Vector2(scale, scale);
-        Map.RefreshPosition(mapClone, parent, loadData.x, loadData.y, 70);
+        Map.RefreshPosition(mapSc, parent, loadData.x, loadData.y, 70);
     }
 
     [ClientRpc]
     public void RpcEdit(int i, int j)
     {
-        mapClone[i,j].SetActive(!mapClone[i, j].activeSelf);
+        //mapClone[i,j].SetActive(!mapClone[i, j].activeSelf);
     }
 }
 

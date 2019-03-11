@@ -86,7 +86,7 @@ public class PlayerCell : CellGame
                 MoveCell(player.speed);
             else
             {
-                MapOffline.instance.cells[iTarget, jTarget].SetValue(str);
+                MapOffline.instance.cells[iTarget, jTarget].SetValue(cellData.str);
                 Destroy(gameObject);
             }
         }
@@ -97,7 +97,7 @@ public class PlayerCell : CellGame
     {
         int nextI = iTarget + (int)velocity.x;
         int nextJ = jTarget + (int)velocity.y;
-        string nameCell = MapOffline.instance.cells[nextI, nextJ].str;
+        string nameCell = MapOffline.instance.cells[nextI, nextJ].cellData.str;
         MapOffline.instance.cells[nextI, nextJ].Clear();
         OccupTo(nextI, nextJ);
         return CreateVagon(nameCell, nextI, nextJ);
@@ -154,7 +154,7 @@ public class PlayerCell : CellGame
         int nextJ = jTarget + (int)velocity.y;
         if (DataGame.ExitRangeGame(nextI, nextJ))
         {
-            if (!MapOffline.instance.cells[nextI, nextJ].occup)
+            if (!MapOffline.instance.cells[nextI, nextJ].cellData.occup)
             {
                 LeaveTo(iPos, jPos);
                 PlayerCell prev = player.getPrev(this);

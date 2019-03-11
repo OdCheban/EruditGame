@@ -88,7 +88,7 @@ public class Player : MonoBehaviour
     {
         string m = "";
         for (int i = 1; i < playerCells.Count; i++)
-            m += playerCells[i].str;
+            m += playerCells[i].cellData.str;
         return m.ToLower();
     }
     void RemovePlayerCells()
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
                 {
                     for (int j = 1; j < playerCells.Count; j++)
                     {
-                        score += DataGame.ABCscore[playerCells[j].str.ToLower()[0]];
+                        score += DataGame.ABCscore[playerCells[j].cellData.str.ToLower()[0]];
                     }
                     score += WordPlayer().Length * DataGame.xBonus;
                     RemovePlayerCells();
