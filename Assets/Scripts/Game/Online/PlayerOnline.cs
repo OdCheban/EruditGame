@@ -11,8 +11,13 @@ public class PlayerOnline : NetworkBehaviour {
         if (!isLocalPlayer) return;
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log(isLocalPlayer + " " + isServer + " " + isClient);
-            MapOnline.instance.CmdEnabled();
+            CmdEdit();
         }
+    }
+
+    [Command]
+    public void CmdEdit()
+    {
+        MapOnline.instance.RpcEdit(2,3);
     }
 }

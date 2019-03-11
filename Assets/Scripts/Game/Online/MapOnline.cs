@@ -12,123 +12,81 @@ public struct LoadDataNet
     public string map;
 }
 
-[System.Serializable]
-public struct CellGameOnline
-{
-    [SyncVar] public GameObject co;
-    public CellGameOnline(GameObject co)
-    {
-        this.co = co;
-    }
-}
-
-[System.Serializable]
-public class SyncListCell : SyncListStruct<CellGameOnline>
-{ }
 
 public class MapOnline : NetworkBehaviour
 {
-    [SyncVar] public LoadDataNet loadData;
-    public Transform parent;
     public static MapOnline instance;
+    [SyncVar] public LoadDataNet loadData;
     [SyncVar] public float scale;
-    public SyncListCell mapData;//convert то двуменый
-    public GameObject[,] mapGo
+
+    public Transform parent;
+    GameObject[,] mapClone;
+
+    private void Awake()
     {
-        get
-        {
-            GameObject[,] mapClone = new GameObject[loadData.x, loadData.y];
-            int k = 0;
-            for (int i = 0; i < loadData.x; i++)
-                for (int j = 0; j < loadData.y; j++)
-                {
-                    mapClone[i, j] = mapData[k].co;
-                    k++;
-                }
-           return mapClone;
-        }
+        instance = this;
     }
 
     public override void OnStartServer()
     {
         if (isServer)
         {
-            Debug.Log("StartServer");
             DataGame.LoadData();
             loadData.x = DataGame.x;
             loadData.y = DataGame.y;
             loadData.map = DataGame.str_map;
         }
     }
-    private void Awake()
-    {
-        instance = this;
-        parent = GameObject.Find("CanvasGame/ParentCell").transform;
-    }
 
     [Command]
-    public void CmdCreate()
+    public void CmdCreateMap()
     {
+        mapClone = new GameObject[loadData.x, loadData.y];
         List<List<string>> map = DataGame.StrToListMap(loadData.map, loadData.x, loadData.y);
         CellGame[,] mapSc = Map.CreateMap(loadData.x, loadData.y, 70, map, CustomNetManager.instance.CreateGOonlineCell);
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
-                mapData.Add(new CellGameOnline(mapSc[i, j].gameObject));
-    }
+                mapClone[i, j] = mapSc[i, j].gameObject;
 
-    SyncListCell GetServerData()
-    {
-        MapOnline[] ob = FindObjectsOfType<MapOnline>();
-        foreach (MapOnline o in ob)
-            if (o.mapData.Count > 1)
-                return o.mapData;
-        return null;
+        scale = Map.ScaleParent(parent, loadData.x, loadData.y);
+        Map.RefreshPosition(mapClone, parent, loadData.x, loadData.y, 70);
     }
 
     [Command]
     public void CmdGetMap()
     {
-        RpcGetMap();
-        RpcRefreshPos();
+        NetworkConnection target = NetworkServer.connections[NetworkServer.connections.Count - 1];
+        for (int i = 0; i < loadData.x; i++)
+            for (int j = 0; j < loadData.y; j++)
+                TargetGetMap(target, mapClone[i, j], i, j);
+        TargetGetParent(target, parent.gameObject);
+        TargetPosMap(target);
+    }
+
+    [TargetRpc]
+    void TargetGetMap(NetworkConnection target, GameObject cell,int i, int j)
+    {
+        if(i==0 && j ==0) mapClone = new GameObject[loadData.x, loadData.y];
+        mapClone[i, j] = cell;
+    }
+
+    [TargetRpc]
+    void TargetGetParent(NetworkConnection target, GameObject parent)
+    {
+        this.parent = parent.transform;
+    }
+
+    [TargetRpc]
+    void TargetPosMap(NetworkConnection target)
+    {
+        parent.localScale = new Vector2(scale, scale);
+        Map.RefreshPosition(mapClone, parent, loadData.x, loadData.y, 70);
     }
 
     [ClientRpc]
-    public void RpcGetMap()
+    public void RpcEdit(int i, int j)
     {
-        Debug.Log("rpc get map");
-        mapData = GetServerData();
+        mapClone[i,j].SetActive(!mapClone[i, j].activeSelf);
     }
-
-
-    [Command]
-    public void CmdRefreshPos()
-    {
-        RpcRefreshPos();
-    }
-
-    [Command]
-    public void CmdEnabled()
-    {
-        RpcEnabled();
-    }
-
-    [ClientRpc]
-    public void RpcEnabled()
-    {
-        mapData[0].co.SetActive(!mapData[0].co.activeSelf);
-    }
-    [ClientRpc]
-    public void RpcRefreshPos()
-    {
-        Debug.Log("update position all " + mapData.Count);
-        Debug.Log(mapData[0]);
-        Debug.Log(mapData[0].co);
-
-            scale = Map.ScaleParent(parent, loadData.x, loadData.y);
-            Map.RefreshPosition(mapGo, parent, loadData.x, loadData.y, 70);
-
-    }
-
-    public override void OnStartClient() { }
 }
 
