@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 [System.Serializable]
 public struct LoadDataNet
 {
-    public float speedVagon;
+    public float speed;
     public float timer;
     public int x;
     public int y;
@@ -23,6 +23,14 @@ public struct CellOnline
     public string map;
 }
 
+[System.Serializable]
+public struct CellGam
+{
+    public bool occup;
+    public string str;
+    public bool connectProcess;
+}
+
 public class SyncListCell: SyncListStruct<CellGam>
 {
 }
@@ -30,13 +38,12 @@ public class SyncListCell: SyncListStruct<CellGam>
 public class MapOnline : NetworkBehaviour
 {
     public static MapOnline instance;
-    public Timer timer;
     [SyncVar] public LoadDataNet loadData;
-    [SyncVar] public float scale;
 
     public Transform parent;
     public SyncListCell mapCells_sync;
-    public CellGame[,] mapCells;
+    public CellGameOnline[,] mapCells;
+    public List<PlayerOnline> players;
 
     private void Awake()
     {
@@ -48,83 +55,67 @@ public class MapOnline : NetworkBehaviour
         if (isServer)
         {
             DataGame.LoadData();
-            loadData.speedVagon = DataGame.speedVagon;
+            loadData.speed = DataGame.speed;
             loadData.timer = DataGame.timeGame;
-            loadData.x = DataGame.x;
-            loadData.y = DataGame.y;
+            loadData.x = DataGame.maxI;
+            loadData.y = DataGame.maxJ;
             loadData.map = DataGame.str_map;
         }
-    }
-
-    [Command]
-    public void CmdCreateMap()
-    {
-        List<List<string>> map = DataGame.StrToListMap(loadData.map, loadData.x, loadData.y);
-        mapCells = Map.CreateMap(loadData.x, loadData.y, 70, map, CustomNetManager.instance.CreateGOonlineCell);
-
-        for (int i = 0; i < loadData.x; i++)
-            for (int j = 0; j < loadData.y; j++)
-            {
-                CellGam cell = new CellGam();
-                cell.str = mapCells[i, j].cellData.str;
-                mapCells_sync.Add(cell);
-            }
-        scale = Map.ScaleParent(parent, loadData.x, loadData.y);
-        Map.StartPosition(mapCells, parent, loadData.x, loadData.y, 70);
     }
 
     [Command]
     public void CmdGetMap()
     {
         NetworkConnection target = NetworkServer.connections[NetworkServer.connections.Count - 1];
-        int k = 0;
+        for (int i = 0; i < loadData.x; i++)
+            for (int j = 0; j < loadData.y; j++)
+                TargetGetMap(target, mapCells[i,j].gameObject, (mapCells[i, j].upCell)?mapCells[i,j].upCell.gameObject:null,i,j);
+    }
+
+    [TargetRpc]
+    public void TargetGetMap(NetworkConnection target, GameObject cell,GameObject upCell,int i,int j)
+    {
+        if(i+j == 0) mapCells = new CellGameOnline[loadData.x, loadData.y];
+        mapCells[i, j] = cell.GetComponent<CellGameOnline>();
+        if (upCell != null)
+        {
+            mapCells[i, j].upCell = upCell.GetComponent<CellUp>();
+            mapCells[i, j].upCell.TextRefresh();
+        }
+    }
+
+    [Command]
+    public void CmdCreateMap()
+    {
+        CreateMap();
+        StartPositionCell();
+
+    }
+
+    //создаем карту пустых клеток
+    void CreateMap()
+    {
+        List<List<string>> mapStr = DataGame.StrToListMap(loadData.map, loadData.x, loadData.y);
+        mapCells = new CellGameOnline[loadData.x,loadData.y];
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
             {
-                TargetGetMap(target, mapCells[i, j].gameObject, i, j, k);
-                k++;
+                mapCells[i, j] = CustomNetManager.instance.CreateGOonlineCell(mapStr[i][j]);
+                mapCells[i, j].upCell = CustomNetManager.instance.CreateGOonlineCellUp(mapStr[i][j], i, j);
             }
-        TargetGetParent(target, parent.gameObject);
-        TargetPosMap(target);
     }
-
-    [TargetRpc]
-    void TargetGetMap(NetworkConnection target, GameObject cell,int i, int j,int k)
+    
+    void StartPositionCell()
     {
-        if (i == 0 && j == 0) mapCells = new CellGame[loadData.x, loadData.y];
-        CellGame cellGame = cell.AddComponent<CellGame>();
-        cellGame.GetData(mapCells_sync[k]);
-        mapCells[i, j] = cellGame;
+        float size = DataGame.sizeBtn;
+        Vector2 offset = new Vector2(-loadData.x * size / 2, loadData.y * size / 1.7f);
+        for (int i = 0; i < loadData.x; i++)
+            for (int j = 0; j < loadData.y; j++)
+            {
+                mapCells[i, j].transform.position = offset + new Vector2((i + 0.5f) * (size + 0.2f), -(j + 0.5f) * (size + 0.2f));
+                if (mapCells[i, j].upCell != null)
+                    mapCells[i, j].upCell.transform.position = mapCells[i, j].transform.position;
+            }
     }
-
-    [TargetRpc]
-    void TargetGetParent(NetworkConnection target, GameObject parent)
-    {
-        this.parent = parent.transform;
-    }
-
-    [TargetRpc]
-    void TargetPosMap(NetworkConnection target)
-    {
-        parent.localScale = new Vector2(scale, scale);
-        Map.StartPosition(mapCells, parent, loadData.x, loadData.y, 70);
-    }
-
-    [ClientRpc]
-    public void RpcEdit(int i, int j)
-    {
-        if (!mapCells[i, j].cellData.occup)
-            mapCells[i, j].Occup();
-        else
-            mapCells[i, j].Leave();
-        //mapClone[i,j].SetActive(!mapClone[i, j].activeSelf);
-    }
-
-
-    public void StartGame()
-    {
-        timer.pause = true;
-    }
-
 }
 

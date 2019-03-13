@@ -7,7 +7,9 @@ using UnityEngine.Networking;
 
 public class CustomNetManager : NetworkManager {
     public static CustomNetManager instance;
-    public MapOnline mapInstance;
+    public List<PlayerOnline> players = new List<PlayerOnline>();
+    public List<NetworkConnection> netPlayers = new List<NetworkConnection>();
+    public Timer timer;
 
     private void Start()
     {
@@ -16,29 +18,70 @@ public class CustomNetManager : NetworkManager {
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        GameObject player = Instantiate(playerPrefab);
-        NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
-
         Debug.Log("add player");
         if (NetworkServer.connections.Count == 1)
-        {
             MapOnline.instance.CmdCreateMap();
-        }
         else
-        {
             MapOnline.instance.CmdGetMap();
-        }
-        if (NetworkServer.connections.Count == 2)
+
+        foreach (PlayerOnline player in players)
         {
-            mapInstance.StartGame();
+            if (player.k == NetworkServer.connections.Count - 1)
+            {
+                NetworkServer.AddPlayerForConnection(conn, player.gameObject, playerControllerId);
+                netPlayers.Add(conn);
+            }
+            player.RpcColorChange();
+        }
+        UIManager.instance.RpcRoomInfo(netPlayers.Count, players.Count);
+        StartCoroutine(TimerToStartGame());
+        if (NetworkServer.connections.Count == players.Count)
+        {
+            StartCoroutine(TimerToStartGame());
         }
     }
 
-    public GameObject CreateGOonlineCell(int sizeBtn)
+    IEnumerator TimerToStartGame()
+    {
+        int k = 0;
+        while (k < DataGame.timeExit)
+        {
+            UIManager.instance.RpcRoomChat((int)DataGame.timeExit - k);
+            k++;
+            yield return new WaitForSeconds(1.0f);
+        }
+        UIManager.instance.RpcStartRoom();
+    }
+
+    public CellGameOnline CreateGOonlineCell(string m)
     {
         GameObject cellGO = Instantiate(spawnPrefabs[0]);
-        cellGO.GetComponent<RectTransform>().sizeDelta = new Vector2(sizeBtn, sizeBtn);
         NetworkServer.Spawn(cellGO);
-        return cellGO;
+        CellGameOnline cellSc = cellGO.GetComponent<CellGameOnline>();
+        return cellSc;
     }
+
+    public CellUp CreateGOonlineCellUp(string m, int i, int j)
+    {
+        CellUp cellUpsc = null;
+        if (m != "cell")
+        {
+            GameObject cellUp = null;
+            if (m == "player")
+            {
+                cellUp = Instantiate(spawnPrefabs[2]);
+                PlayerOnline player = cellUp.GetComponent<PlayerOnline>();
+                player.k = players.Count;
+                players.Add(player);
+            }
+            else
+            {
+                cellUp = Instantiate(spawnPrefabs[1]);
+            }
+            NetworkServer.Spawn(cellUp);
+            cellUpsc = cellUp.GetComponent<CellUp>();
+            cellUpsc.Create(m, i, j);
+        }
+        return cellUpsc;
+   }
 }

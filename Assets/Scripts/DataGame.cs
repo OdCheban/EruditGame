@@ -9,8 +9,8 @@ public class DataGame : MonoBehaviour {
     public static bool loadData;
     private static int _x;
     private static int _y;
-    public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
-    public static KeyCode[] key = new KeyCode[7] { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.Z, KeyCode.X, KeyCode.Q };
+    public static Color[] colorPlayers = new Color[4] { Color.blue, Color.red,Color.green,Color.yellow };
+    public static KeyCode[] key = new KeyCode[7] { KeyCode.D, KeyCode.A, KeyCode.S, KeyCode.W, KeyCode.Z, KeyCode.X, KeyCode.Q };
 
     public static string str_map
     {
@@ -27,25 +27,25 @@ public class DataGame : MonoBehaviour {
     }
     public static List<List<string>> map;
     public static List<string> abcResult;
-    public static int y
+    public static int maxJ
     {
-        get { return _y + 2; }
+        get { return _y; }
         set { _y = value; }
     }
-    public static int x
+    public static int maxI
     {
-        get { return _x + 2; }
+        get { return _x; }
         set { _x = value; }
     }
     public static int modeMove;//0(hard)/1(easy)
-    public static float timeExit;
+    public static int timeExit;
     public static float timeGame;
     public static float speed;
     public static float speedVagon;
     public static float speedConnect;
     public static float speedDisconnect;
     public static float xBonus;
-    public static int sizeBtn = 70;
+    public static float sizeBtn = 1.0f;
 
     public static Dictionary<char,int> ABCscore = new Dictionary<char, int>() {
         { 'а', 1 },
@@ -85,15 +85,22 @@ public class DataGame : MonoBehaviour {
     public static List<string> abc = new List<string>();
     public static bool ExitRange(int i, int j, int iMax = 0, int jMax = 0)
     {
-        if (iMax == 0) { iMax = x; jMax = y; }
+        if (iMax == 0) { iMax = maxI; jMax = maxJ; }
         return ((i != 0 || j != 0) &&
                    (i != iMax - 1 || j != 0) &&
                    (i != 0 || j != jMax - 1) &&
                    (i != iMax - 1 || j != jMax - 1));
     }
-    public static bool ExitRangeGame(int i, int j)
+    public static bool ExitRangeGame(int i, int j, int maxI = -1,int maxJ = -1)
     {
-        return (i != 0 && j != 0) && (i < x - 1 && j < y - 1);
+        int iMax = DataGame.maxI;
+        int jMax = DataGame.maxJ;
+        if(maxI != -1)
+        {
+            iMax = maxI;
+            jMax = maxJ;
+        }
+        return (i >= 0 && j >= 0) && (i < iMax && j < jMax);
     }
 
     public static void ReadDictonaryFromFile()
@@ -112,10 +119,10 @@ public class DataGame : MonoBehaviour {
 
     public static void LoadData()
     {
-        x = PlayerPrefs.GetInt("x", 5);
-        y = PlayerPrefs.GetInt("y", 5);
+        maxI = PlayerPrefs.GetInt("x", 5);
+        maxJ = PlayerPrefs.GetInt("y", 5);
         modeMove = PlayerPrefs.GetInt("move", 0);
-        timeExit = PlayerPrefs.GetFloat("timeExit", 2.0f);
+        timeExit = PlayerPrefs.GetInt("timeExit", 2);
         timeGame = PlayerPrefs.GetFloat("timeGame", 60);
         speed = PlayerPrefs.GetFloat("speed", 1.5f);
         speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
@@ -139,7 +146,7 @@ public class DataGame : MonoBehaviour {
         }
         else
         {
-            map = StrToListMap(m,x,y);
+            map = StrToListMap(m,maxI,maxJ);
         }
         DataGame.loadData = true;
     }

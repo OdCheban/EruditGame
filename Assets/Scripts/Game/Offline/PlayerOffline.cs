@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return (DataGame.sizeBtn*MapOnline.instance.scale) / (DataGame.speed + (playerCells.Count-1)*DataGame.speedVagon);
+            return (DataGame.sizeBtn) / (DataGame.speed + (playerCells.Count-1)*DataGame.speedVagon);
         }
     }
     public Vector2 velocity;
@@ -154,7 +154,7 @@ public class Player : MonoBehaviour
         UIManager.instance.add_img.fillAmount = 0;
         int nextI = playerHead.iTarget + (int)velocity.x;
         int nextJ = playerHead.jTarget + (int)velocity.y;
-        MapOnline.instance.mapCells[nextI, nextJ].connectProcess = true;
+        MapOffline.instance.mapCells[nextI, nextJ].connectProcess = true;
         while (UIManager.instance.add_img.fillAmount < 1.0f)
         {
             UIManager.instance.add_img.fillAmount += DataGame.speedConnect;
@@ -162,7 +162,7 @@ public class Player : MonoBehaviour
         }
         playerCells.Add(playerHead.Connect(velocity));
         
-        MapOnline.instance.mapCells[nextI, nextJ].connectProcess = false;
+        MapOffline.instance.mapCells[nextI, nextJ].connectProcess = false;
         UIManager.instance.rem_btn.interactable = (playerCells.Count > 1) ? true : false;
         ChangeTargetArrow(playerHead.transform);
         processConnect = false;

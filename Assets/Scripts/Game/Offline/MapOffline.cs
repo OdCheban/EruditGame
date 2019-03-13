@@ -6,18 +6,16 @@ using UnityEngine.UI;
 public class MapOffline : MonoBehaviour {
     public static MapOffline instance;
 
-    public CellGame[,] mapCells = new CellGame[DataGame.x, DataGame.y];
+    public CellGame[,] mapCells = new CellGame[DataGame.maxI, DataGame.maxJ];
 
     public Transform parent;
-    [HideInInspector] public float scale;
 
     private void Awake()
     {
         instance = this;
 
-        mapCells = Map.CreateMap(DataGame.x,DataGame.y,DataGame.sizeBtn,DataGame.map,Map.CreateGOcell);
-        scale = Map.ScaleParent(parent, DataGame.x, DataGame.y);
-        Map.StartPosition(mapCells, parent, DataGame.x, DataGame.y, DataGame.sizeBtn);
+        mapCells = Map.CreateMap(DataGame.maxI,DataGame.maxJ,DataGame.sizeBtn,DataGame.map,Map.CreateGOcell);
+        Map.StartPosition(mapCells, parent, DataGame.maxI, DataGame.maxJ, DataGame.sizeBtn);
 
         StartCoroutine(CountdownToStart());
     }

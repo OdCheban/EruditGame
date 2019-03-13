@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[System.Serializable]
-public struct CellGam
-{
-    public bool occup;
-    public string str;
-    public bool connectProcess;
-}
-
 public class CellGame : MonoBehaviour {
     public CellGam cellData = new CellGam();
     public CellGame cellUp;

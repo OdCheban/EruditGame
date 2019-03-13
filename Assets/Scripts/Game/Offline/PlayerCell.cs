@@ -17,7 +17,7 @@ public class PlayerCell : CellGame
     {
         try
         {
-            position = Vector2.MoveTowards(position, MapOnline.instance.mapCells[iTarget, jTarget].position, speed * Time.deltaTime);
+            position = Vector2.MoveTowards(position, MapOffline.instance.mapCells[iTarget, jTarget].position, speed * Time.deltaTime);
         }
         catch
         {
@@ -28,7 +28,7 @@ public class PlayerCell : CellGame
     {
         if (DataGame.ExitRangeGame(iTarget, jTarget))
         {
-            float dist = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].position);
+            float dist = Vector2.Distance(position, MapOffline.instance.mapCells[iTarget, jTarget].position);
             return (dist < 0.1f);
         }
         else
@@ -53,14 +53,14 @@ public class PlayerCell : CellGame
     {
         bool arrive = false;
         if (hasArrived() && DataGame.ExitRangeGame(nextI, nextJ))
-            arrive = (MapOnline.instance.mapCells[nextI, nextJ].isAbc &&
-                !MapOnline.instance.mapCells[nextI, nextJ].connectProcess) ? true : false;
+            arrive = (MapOffline.instance.mapCells[nextI, nextJ].isAbc &&
+                !MapOffline.instance.mapCells[nextI, nextJ].connectProcess) ? true : false;
         return arrive;
     }
 
     public bool ExitABC()
     {
-        return (iPos-1 == 0 || jPos-1 == 0 || iPos+2 == DataGame.x || jPos+2 == DataGame.y);
+        return (iPos-1 == 0 || jPos-1 == 0 || iPos+2 == DataGame.maxI || jPos+2 == DataGame.maxJ);
     }
 
     public void Create(string typeStr, int i, int j)
@@ -83,7 +83,7 @@ public class PlayerCell : CellGame
                 MoveToTarget(Player.instance.speed);
             else
             {
-                MapOnline.instance.mapCells[iTarget, jTarget].SetValue(cellData.str);
+                MapOffline.instance.mapCells[iTarget, jTarget].SetValue(cellData.str);
                 Destroy(gameObject);
             }
         }
@@ -93,8 +93,8 @@ public class PlayerCell : CellGame
     {
         int nextI = iTarget + (int)velocity.x;
         int nextJ = jTarget + (int)velocity.y;
-        string nameCell = MapOnline.instance.mapCells[nextI, nextJ].cellData.str;
-        MapOnline.instance.mapCells[nextI, nextJ].Clear();
+        string nameCell = MapOffline.instance.mapCells[nextI, nextJ].cellData.str;
+        MapOffline.instance.mapCells[nextI, nextJ].Clear();
         OccupTo(nextI, nextJ);
         return CreateVagon(nameCell, nextI, nextJ);
     }
@@ -102,23 +102,23 @@ public class PlayerCell : CellGame
     PlayerCell CreateVagon(string str,int i, int j)
     {
         PlayerCell newVagon = Player.instance.CreatePlayerCell(str, i, j);
-        newVagon.transform.SetParent(MapOnline.instance.parent);
+        newVagon.transform.SetParent(MapOffline.instance.parent);
         newVagon.transform.localScale = Vector3.one;
         newVagon.GetComponent<RectTransform>().sizeDelta = new Vector2(70, 70);
-        newVagon.transform.localPosition = MapOnline.instance.mapCells[i, j].transform.localPosition;
+        newVagon.transform.localPosition = MapOffline.instance.mapCells[i, j].transform.localPosition;
         return newVagon;
     }
 
     void OccupTo(int i, int j)
     {
-        MapOnline.instance.mapCells[i, j].Occup();
+        MapOffline.instance.mapCells[i, j].Occup();
     }
 
     public void DestroyCell()
     {
         iPos = iTarget;
         jPos = jTarget;
-        MapOnline.instance.mapCells[iPos, jPos].Leave();
+        MapOffline.instance.mapCells[iPos, jPos].Leave();
         Destroy(gameObject);
     }
 
@@ -129,8 +129,8 @@ public class PlayerCell : CellGame
         {
             prev.LeaveTo(prev.iTarget, prev.jTarget);
         }
-        if (DataGame.ExitRangeGame(i, j) && MapOnline.instance.mapCells[i, j] != this )
-            MapOnline.instance.mapCells[i, j].Leave();
+        if (DataGame.ExitRangeGame(i, j) && MapOffline.instance.mapCells[i, j] != this )
+            MapOffline.instance.mapCells[i, j].Leave();
     }
 
     public void FollowMe(int iTo, int jTo)
@@ -153,7 +153,7 @@ public class PlayerCell : CellGame
         int nextJ = jTarget + (int)velocity.y;
         if (DataGame.ExitRangeGame(nextI, nextJ))
         {
-            if (!MapOnline.instance.mapCells[nextI, nextJ].cellData.occup)
+            if (!MapOffline.instance.mapCells[nextI, nextJ].cellData.occup)
             {
                 LeaveTo(iPos, jPos);
                 PlayerCell prev = Player.instance.getPrev(this);

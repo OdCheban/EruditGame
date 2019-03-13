@@ -5,18 +5,19 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
-    public enum TypeBtn { Default, Player, Abc }
-    public TypeBtn type;
+    public int i;
+    public int j;
     public Text txt;
     public string text
     {
         set { txt.text = value; }
         get { return txt.text; }
     }
-    public void Create(TypeBtn type)
+    public void Create(int i = -1,int j = -1)
     {
+        this.i = i;
+        this.j = j;
         txt = transform.GetChild(0).GetComponent<Text>();
-        this.type = type;
         UnClick();
     }
 
@@ -35,10 +36,10 @@ public class Cell : MonoBehaviour
 
     void SetValue(Cell fromTxt,Cell toTxt)
     {
-        bool toPlayer = (toTxt.type == TypeBtn.Player && 
-            ((fromTxt.text == "player" && EditScene.instance.kPlayers < 2) || fromTxt.text == ""));
-        bool notToPlayer = (toTxt.type != TypeBtn.Player && (fromTxt.text != "player"));
-        if (notToPlayer || toPlayer)
+        bool exitRange = (j == 0|| i == 0 || EditScene.instance.x == i+1 || EditScene.instance.y == j+1);
+        bool toPlayer = ((fromTxt.text == "player" && EditScene.instance.kPlayers < 2) || fromTxt.text == "");
+        bool notToPlayer = fromTxt.text != "player";
+        if (notToPlayer || (toPlayer&&exitRange))
         {
             if (toPlayer)
             {
@@ -56,15 +57,6 @@ public class Cell : MonoBehaviour
 
     public void UnClick()
     {
-        switch (type)
-        {
-            case TypeBtn.Default:
-            case TypeBtn.Abc:
-                GetComponent<Image>().color = Color.white;
-                break;
-            case TypeBtn.Player:
-                GetComponent<Image>().color = Color.blue;
-                break;
-        }
+        GetComponent<Image>().color = Color.white;
     }
 }

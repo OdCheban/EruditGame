@@ -5,9 +5,9 @@ using UnityEngine.Networking;
 
 public class Map : MonoBehaviour {
 
-    public delegate GameObject CreateCellFunc(int sizeBtn);
+    public delegate GameObject CreateCellFunc(float sizeBtn);
 
-    public static CellGame[,] CreateMap(int x, int y, int sizeBtn, List<List<string>> map,CreateCellFunc CreateFunc)
+    public static CellGame[,] CreateMap(int x, int y, float sizeBtn, List<List<string>> map,CreateCellFunc CreateFunc)
     {
         CellGame[,] mapSc = new CellGame[x, y];
         int kPlayers = 0;
@@ -17,14 +17,8 @@ public class Map : MonoBehaviour {
 
         return mapSc;
     }
-    public static float ScaleParent(Transform parent, int x, int y)
-    {
-        float max = Mathf.Max(x, y);
-        float scale = 15.0f / max;
-        parent.localScale = new Vector2(scale, scale);
-        return scale;
-    }
-    public static CellGame CreateCell(ref int N, int i, int j, string typeStr, int width, int height, int sizeBtn, CreateCellFunc CreateFunc)
+
+    public static CellGame CreateCell(ref int N, int i, int j, string typeStr, int width, int height, float sizeBtn, CreateCellFunc CreateFunc)
     {
         if (typeStr != "null")
         {
@@ -55,7 +49,7 @@ public class Map : MonoBehaviour {
         }
     }
 
-    public static void StartPosition(CellGame[,] mas,Transform parent, int width,int height,int sizeBtn)
+    public static void StartPosition(CellGame[,] mas,Transform parent, int width,int height,float sizeBtn)
     {
         for (int i = 0; i < width; i++)
         {
@@ -64,10 +58,9 @@ public class Map : MonoBehaviour {
                 if (mas[i, j] != null)
                 {
                     mas[i, j].transform.SetParent(parent);
-                    mas[i, j].transform.localScale = Vector3.one;
                     mas[i, j].GetComponent<RectTransform>().sizeDelta = new Vector2(sizeBtn, sizeBtn);
                     Vector2 offset = new Vector2(-width * sizeBtn / 2, height * sizeBtn / 2);
-                    mas[i, j].transform.localPosition = offset + new Vector2((i + 0.5f) * sizeBtn, -(j + 0.5f) * sizeBtn);
+                    mas[i, j].transform.position = offset + new Vector2((i + 0.5f) * (sizeBtn+0.2f), -(j + 0.5f) * (sizeBtn + 0.2f));
                 }
                 else
                     Debug.Log(i + " " + j);
@@ -75,7 +68,7 @@ public class Map : MonoBehaviour {
         }
     }
 
-    public static GameObject CreateGOcell(int sizeBtn)
+    public static GameObject CreateGOcell(float sizeBtn)
     {
         GameObject cellGO = (GameObject)Instantiate(Resources.Load("Cell"));
         cellGO.GetComponent<RectTransform>().sizeDelta = new Vector2(sizeBtn, sizeBtn);
