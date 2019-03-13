@@ -18,7 +18,6 @@ public class CustomNetManager : NetworkManager {
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        Debug.Log("add player");
         if (NetworkServer.connections.Count == 1)
             MapOnline.instance.CmdCreateMap();
         else
@@ -34,7 +33,7 @@ public class CustomNetManager : NetworkManager {
             player.RpcColorChange();
         }
         UIManager.instance.RpcRoomInfo(netPlayers.Count, players.Count);
-        StartCoroutine(TimerToStartGame());
+
         if (NetworkServer.connections.Count == players.Count)
         {
             StartCoroutine(TimerToStartGame());
@@ -80,7 +79,7 @@ public class CustomNetManager : NetworkManager {
             }
             NetworkServer.Spawn(cellUp);
             cellUpsc = cellUp.GetComponent<CellUp>();
-            cellUpsc.Create(m, i, j);
+            cellUpsc.CmdCreate(m, i, j);
         }
         return cellUpsc;
    }

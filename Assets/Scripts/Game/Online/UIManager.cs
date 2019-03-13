@@ -10,11 +10,11 @@ public class UIManager : NetworkBehaviour {
     public NetworkManager manager;
 
     [Header("UI:")]
+    public GameObject player_ui;
+    public GameObject worldRoom_ui;
     public GameObject room_ui;
     public Text roomInfo;
     public Text roomChat;
-
-    public GameObject worldRoom_ui;
 
     public Button add_btn;
     public Button rem_btn;
@@ -26,20 +26,8 @@ public class UIManager : NetworkBehaviour {
     private void Awake()
     {
         instance = this;
-        //rem_img = rem_btn.GetComponent<Image>();
-        //add_img = add_btn.GetComponent<Image>();
-    }
-    
-    public void StartGame()
-    {
-        add_btn.gameObject.SetActive(true);
-        rem_btn.gameObject.SetActive(true);
-        points_text.gameObject.SetActive(true);
-        stateGame_text.gameObject.SetActive(false);
-
-        Player player = FindObjectOfType<Player>();
-        rem_btn.onClick.AddListener(() => player.Disconnect());
-        add_btn.onClick.AddListener(() => player.Connect());
+        rem_img = rem_btn.GetComponent<Image>();
+        add_img = add_btn.GetComponent<Image>();
     }
 
     private void Update()
@@ -71,6 +59,9 @@ public class UIManager : NetworkBehaviour {
         Camera.main.transform.position = new Vector3(0, 0, -10);
         worldRoom_ui.SetActive(false);
         room_ui.SetActive(false);
+        player_ui.SetActive(true);
+        rem_btn.onClick.AddListener(() => PlayerOnline.instance.Disconnect());
+        add_btn.onClick.AddListener(() => PlayerOnline.instance.Connect());
     }
     public void CreateRoom()
     {
@@ -88,12 +79,14 @@ public class UIManager : NetworkBehaviour {
         Camera.main.transform.position = new Vector3(0, 0, -10);
         worldRoom_ui.SetActive(true);
         room_ui.SetActive(false);
+        player_ui.SetActive(false);
     }
     void EnterRoom()
     {
         Camera.main.transform.position = new Vector3(4, 0, -10);
         worldRoom_ui.SetActive(false);
         room_ui.SetActive(true);
+        player_ui.SetActive(false);
     }
 
 

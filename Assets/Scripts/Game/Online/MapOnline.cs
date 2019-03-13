@@ -9,6 +9,9 @@ using UnityEngine.Networking;
 public struct LoadDataNet
 {
     public float speed;
+    public float speedVagon;
+    public float speedDisconnect;
+    public float speedConnect;
     public float timer;
     public int x;
     public int y;
@@ -60,6 +63,9 @@ public class MapOnline : NetworkBehaviour
             loadData.x = DataGame.maxI;
             loadData.y = DataGame.maxJ;
             loadData.map = DataGame.str_map;
+            loadData.speedDisconnect = DataGame.speedDisconnect;
+            loadData.speedConnect = DataGame.speedConnect;
+            loadData.speedVagon = DataGame.speedVagon;
         }
     }
 

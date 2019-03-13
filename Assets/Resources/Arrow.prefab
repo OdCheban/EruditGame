@@ -36,6 +36,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224345971937489078}
+  - component: {fileID: 114553154765703286}
+  - component: {fileID: 114744053400882448}
   m_Layer: 5
   m_Name: Arrow
   m_TagString: Untagged
@@ -70,6 +72,59 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114553154765703286
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1696593884684806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 21
+    i1: 48
+    i2: 43
+    i3: 131
+    i4: 57
+    i5: 120
+    i6: 219
+    i7: 180
+    i8: 43
+    i9: 45
+    i10: 45
+    i11: 68
+    i12: 39
+    i13: 99
+    i14: 131
+    i15: 107
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
+--- !u!114 &114744053400882448
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1696593884684806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 1
+  m_SendInterval: 0.033333335
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
 --- !u!222 &222956024580506910
 CanvasRenderer:
   m_ObjectHideFlags: 1

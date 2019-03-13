@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class CellGameOnline : NetworkBehaviour
 {
     public CellUp upCell;
+    [SyncVar] public bool connectProcess;
     void Awake()
     {
         GetComponent<RectTransform>().sizeDelta = new Vector2(DataGame.sizeBtn, DataGame.sizeBtn);
@@ -16,14 +17,12 @@ public class CellGameOnline : NetworkBehaviour
     [ClientRpc]
     public void RpcOccup(GameObject cell)
     {
-        Debug.Log("занял!");
         upCell = cell.GetComponent<CellUp>();
         GetComponent<Image>().color = Color.gray;
     }
     [ClientRpc]
     public void RpcLeave()
     {
-        Debug.Log("освободил!");
         upCell = null;
         GetComponent<Image>().color = Color.white;
     }

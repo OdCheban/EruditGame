@@ -9,7 +9,7 @@ public class CellUp : NetworkBehaviour
     [SyncVar] public string str;
     private Text textUI;
     protected Image icon;
-
+    [SyncVar] public bool unConnect;
     [SyncVar] public int nextI;
     [SyncVar] public int nextJ;
     [SyncVar] public int iPos;
@@ -26,31 +26,13 @@ public class CellUp : NetworkBehaviour
         AwakeExtra();
     }
     protected virtual void AwakeExtra() { }
-    public void Create(string typeStr, int i, int j)
-    {
-        CmdPos(i, j);
-        CmdTarget(i, j);
-        TextRefresh(typeStr);
-    }
 
     [Command]
-    public void CmdNext(int i, int j)
+    public void CmdCreate(string typeStr, int i, int j)
     {
-        Debug.Log("next: " + i + " " + j);
-        nextI = i;
-        nextJ = j;
-    }
-    [Command]
-    public void CmdPos(int i,int j)
-    {
-        iPos = i;
-        jPos = j;
-    }
-    [Command]
-    public void CmdTarget(int i, int j)
-    {
-        iTarget = i;
-        jTarget = j;
+        iPos = iTarget = i;
+        jPos = jTarget = j;
+        TextRefresh(typeStr);
     }
 
     public Vector2 position
@@ -65,7 +47,8 @@ public class CellUp : NetworkBehaviour
         textUI.text = str;
     }
 
-    public void MoveToTarget(float speed)
+    [ClientRpc]
+    public void RpcMoveToTarget(float speed)
     {
         position = Vector2.MoveTowards(position, MapOnline.instance.mapCells[iTarget,jTarget].transform.position, speed * Time.deltaTime);
     }
@@ -75,17 +58,17 @@ public class CellUp : NetworkBehaviour
         if (DataGame.ExitRangeGame(nextI, nextJ, ldn.x, ldn.y))
         {
             float dist = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].transform.position);
-            return (dist < 0.1f);
+            return (dist < 0.01f);
         }
         else
             return false;
     }
     public void MoveNext(Vector2 velocity)
     {
-        CmdNext(iTarget + (int)velocity.x, jTarget + (int)velocity.y);
+        PlayerOnline.instance.CmdNext(gameObject, iTarget + (int)velocity.x, jTarget + (int)velocity.y);
         if (hasArrived())
         {
-            CmdPos(iTarget, jTarget);
+            PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
             NextCell(velocity);
         }
     }
@@ -98,26 +81,72 @@ public class CellUp : NetworkBehaviour
         {
             if (MapOnline.instance.mapCells[nextI, nextJ].upCell == null)
             {
-                PlayerOnline.instance.CmdLeaveTo(iTarget, jTarget);
+                PlayerOnline.instance.CmdLeaveTo(gameObject, iPos,jPos);
                 CellUp prev = PlayerOnline.instance.getPrev(this);
                 if (prev != null)
-                {
                     prev.FollowMe(iTarget, jTarget);
-                }
-                CmdTarget(nextI, nextJ);
+                PlayerOnline.instance.CmdTarget(gameObject,nextI, nextJ);
                 PlayerOnline.instance.CmdOccupTo(gameObject,nextI, nextJ);
             }
         }
     }
+
+    public CellUp Connect(Vector2 velocity)
+    {
+        int nextI = iTarget + (int)velocity.x;
+        int nextJ = jTarget + (int)velocity.y;
+        PlayerOnline.instance.CmdNext(gameObject, nextI,nextJ);
+        CellUp cellUp = MapOnline.instance.mapCells[nextI, nextJ].upCell;
+        PlayerOnline.instance.CmdPos(cellUp.gameObject, nextI, nextJ);
+        PlayerOnline.instance.CmdTarget(cellUp.gameObject, nextI, nextJ);
+        return cellUp;
+    }
     public void FollowMe(int iTo, int jTo)
     {
-        CmdPos(iTarget, jTarget);
-        CmdTarget(iTo, jTo);
-        PlayerOnline.instance.CmdOccupTo(gameObject,iTarget, jTarget);
+        PlayerOnline.instance.CmdPos(gameObject,iTarget, jTarget);
+        PlayerOnline.instance.CmdTarget(gameObject,iTo, jTo);
+        PlayerOnline.instance.CmdOccupTo(gameObject,iTo,jTo);
         CellUp prev = PlayerOnline.instance.getPrev(this);
         if (prev != null)
         {
-            prev.FollowMe(iPos, jPos);
+            prev.FollowMe(iPos,jPos);
+        }
+    }
+    public bool CheckNextAbc()
+    {
+        LoadDataNet ldn = MapOnline.instance.loadData;
+        if (hasArrived() && DataGame.ExitRangeGame(nextI, nextJ, ldn.x, ldn.y))
+        {
+            if (MapOnline.instance.mapCells[nextI, nextJ].upCell != null)
+            {
+                return (MapOnline.instance.mapCells[nextI, nextJ].upCell.isAbc() &&
+                    !MapOnline.instance.mapCells[nextI, nextJ].connectProcess);
+            }
+        }
+        return false;
+    }
+    public bool isAbc()
+    {
+        return (str.Length == 1);
+    }
+
+    [ClientRpc]
+    public void RpcDisconnectCell()
+    {
+        unConnect = true;
+        GetComponent<Image>().color = Color.white;
+    }
+
+    private void Update()
+    {
+        if (unConnect)
+        {
+            if (!hasArrived())
+                RpcMoveToTarget(MapOnline.instance.loadData.speed);
+            else
+            {
+                PlayerOnline.instance.CmdUnConnectEnd(gameObject, iTarget, jTarget);
+            }
         }
     }
 }
