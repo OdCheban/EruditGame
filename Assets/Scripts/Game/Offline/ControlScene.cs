@@ -22,28 +22,8 @@ public class ControlScene : MonoBehaviour {
     public void EndGame()
     {
         Time.timeScale = 0;
-        string strResult = "";
-        List<Player> winPlayers = new List<Player>();
-        foreach (Player player in MapOffline.instance.players)
-        {
-            if (winPlayers.Count == 0 || player.score > winPlayers[0].score)
-            {
-                winPlayers.Clear();
-                winPlayers.Add(player);
-            }else if(player.score == winPlayers[0].score)
-            {
-                winPlayers.Add(player);
-            }
-            strResult += StrColor(player.GetComponent<Image>().color) + " игрок получил " + player.score + " очков" + "\n";
-        }
-        strResult += "\n";
-
-        string nameWiners = "";
-        foreach (Player winPlayer in winPlayers)
-            nameWiners += StrColor(winPlayer.GetComponent<Image>().color) + " ";
-
         canvasEnd.SetActive(true);
-        txtResult.text = strResult + "Победил " + nameWiners + " игрок!";
+        txtResult.text = "Игрок набрал " + Player.instance.score + " игрок!";
     }
 
     private string StrColor(Color color)

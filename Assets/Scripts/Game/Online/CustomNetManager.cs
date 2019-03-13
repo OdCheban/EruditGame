@@ -28,6 +28,10 @@ public class CustomNetManager : NetworkManager {
         {
             MapOnline.instance.CmdGetMap();
         }
+        if (NetworkServer.connections.Count == 2)
+        {
+            mapInstance.StartGame();
+        }
     }
 
     public GameObject CreateGOonlineCell(int sizeBtn)

@@ -13,6 +13,7 @@ public struct CellGam
 
 public class CellGame : MonoBehaviour {
     public CellGam cellData = new CellGam();
+    public CellGame cellUp;
     public Vector2 position
     {
         get { return transform.position; }
@@ -24,6 +25,7 @@ public class CellGame : MonoBehaviour {
     }
     public bool connectProcess;
     private Text txt;
+
     private void Awake()
     {
         txt = transform.GetChild(0).GetComponent<Text>();
@@ -57,12 +59,12 @@ public class CellGame : MonoBehaviour {
     {
         GetComponent<Image>().color = Color.white;
         cellData.occup = true;
-        cellData.str = m;
+        cellData.str = txt.text = m;
     }
     public void Clear()
     {
         cellData.occup = false;
-        cellData.str = "";
+        cellData.str = txt.text = "";
     }
 
 }

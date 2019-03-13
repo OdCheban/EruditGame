@@ -10,7 +10,7 @@ public class DataGame : MonoBehaviour {
     private static int _x;
     private static int _y;
     public static Color[] colorPlayers = new Color[2] { Color.blue, Color.red };
-    public static KeyCode[,] key = new KeyCode[2,7] { { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S,KeyCode.Z,KeyCode.X,KeyCode.Q },{ KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,KeyCode.RightShift,KeyCode.M,KeyCode.Space } };
+    public static KeyCode[] key = new KeyCode[7] { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.Z, KeyCode.X, KeyCode.Q };
 
     public static string str_map
     {

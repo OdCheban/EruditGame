@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class PlayerOnline : NetworkBehaviour {
+public class ControllOnline : NetworkBehaviour {
     private Text txtInfo;
     private void Update()
     {
@@ -18,6 +18,6 @@ public class PlayerOnline : NetworkBehaviour {
     [Command]
     public void CmdEdit()
     {
-        MapOnline.instance.RpcEdit(2,3);
+        //Player.instance.
     }
 }
