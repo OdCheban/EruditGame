@@ -16,6 +16,7 @@ public struct LoadDataNet
     public int x;
     public int y;
     public string map;
+    public string abc;
 }
 
 [System.Serializable]
@@ -43,6 +44,7 @@ public class MapOnline : NetworkBehaviour
     public static MapOnline instance;
     [SyncVar] public LoadDataNet loadData;
 
+    [NonSerialized] public List<string> abcList;
     public Transform parent;
     public SyncListCell mapCells_sync;
     public CellGameOnline[,] mapCells;
@@ -66,6 +68,8 @@ public class MapOnline : NetworkBehaviour
             loadData.speedDisconnect = DataGame.speedDisconnect;
             loadData.speedConnect = DataGame.speedConnect;
             loadData.speedVagon = DataGame.speedVagon;
+            foreach (string d in DataGame.abcResult)
+                loadData.abc += d + " ";
         }
     }
 
@@ -76,6 +80,7 @@ public class MapOnline : NetworkBehaviour
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
                 TargetGetMap(target, mapCells[i,j].gameObject, (mapCells[i, j].upCell)?mapCells[i,j].upCell.gameObject:null,i,j);
+        abcList = loadData.abc.Split(' ').ToList();
     }
 
     [TargetRpc]
@@ -88,6 +93,7 @@ public class MapOnline : NetworkBehaviour
             mapCells[i, j].upCell = upCell.GetComponent<CellUp>();
             mapCells[i, j].upCell.TextRefresh();
         }
+        abcList = loadData.abc.Split(' ').ToList();
     }
 
     [Command]

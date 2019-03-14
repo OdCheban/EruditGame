@@ -166,9 +166,61 @@ public class PlayerOnline : CellUp
                 CmdMovePlayer();
             }
             UIManager.instance.add_btn.interactable = connectIf = playerHead.CheckNextAbc();
+            LetterExitCheck();
         }
         UpdateRotArrow();
     }
+    string WordPlayer()
+    {
+        string m = "";
+        for (int i = 1; i < playerCells.Count; i++)
+            m += playerCells[i].str;
+        return m.ToLower();
+    }
+
+    void LetterExitCheck()
+    {
+        if (playerHead.ExitABC())
+            foreach (string resultWords in MapOnline.instance.abcList)
+                if (resultWords == WordPlayer())
+                {
+                    for (int j = 1; j < playerCells.Count; j++)
+                    {
+                        score += DataGame.ABCscore[playerCells[j].str.ToLower()[0]];
+                    }
+                    score += WordPlayer().Length * DataGame.xBonus;
+                    CmdRemovePlayerCells();
+                }
+    }
+
+    [Command]
+    void CmdRemovePlayerCells()
+    {
+        RpcRemoveCells();
+    }
+
+    [ClientRpc]
+    void RpcRemoveCells()
+    {
+        try
+        {
+            List<CellUp> destrCell = new List<CellUp>(playerCells);
+            int k = playerCells.Count;
+            for (int i = 1; i < k; i++)
+            {
+                playerCells.RemoveAt(1);
+            }
+            RpcChangeTargetArrow();
+            for (int i = 1; i < destrCell.Count; i++)
+            {
+                destrCell[i].RpcDestroyCell();
+            }
+        }catch
+        {
+            Debug.Log("error");
+        }
+    }
+
 
     [Command]
     void CmdMovePlayer()

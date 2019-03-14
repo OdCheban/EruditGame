@@ -116,16 +116,16 @@ public class DataGame : MonoBehaviour {
 
     public static void ReadDictonaryFromFile()
     {
-        //StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
-        //string sLine = "";
-        //while (sLine != null)
-        //{
-        //    sLine = objReader.ReadLine();
-        //    if (sLine != null && sLine.Length > 1)
-        //    {
-        //        abc.Add(sLine);
-        //    }
-        //}
+        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+        string sLine = "";
+        while (sLine != null)
+        {
+            sLine = objReader.ReadLine();
+            if (sLine != null && sLine.Length > 1)
+            {
+                abc.Add(sLine);
+            }
+        }
     }
 
     public static void LoadData()

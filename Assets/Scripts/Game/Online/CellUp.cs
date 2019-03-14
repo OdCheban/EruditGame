@@ -35,7 +35,14 @@ public class CellUp : NetworkBehaviour
         jPos = jTarget = j;
         TextRefresh(typeStr);
     }
-
+    [ClientRpc]
+    public void RpcDestroyCell()
+    {
+        iPos = iTarget;
+        jPos = jTarget;
+        MapOnline.instance.mapCells[iPos, jPos].RpcLeave();
+        NetworkServer.Destroy(gameObject);
+    }
     public Vector2 position
     {
         get { return transform.position; }
@@ -138,7 +145,10 @@ public class CellUp : NetworkBehaviour
         unConnect = true;
         GetComponent<Image>().color = Color.white;
     }
-
+    public bool ExitABC()
+    {
+        return (iPos == 0 || jPos == 0 || iPos == MapOnline.instance.loadData.x || jPos == MapOnline.instance.loadData.y);
+    }
     private void Update()
     {
         if (unConnect)

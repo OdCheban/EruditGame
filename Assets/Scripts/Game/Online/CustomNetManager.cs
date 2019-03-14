@@ -26,6 +26,7 @@ public class CustomNetManager : NetworkManager {
 
         if (players.Count < NetworkServer.connections.Count)
         {
+            Debug.Log("discon!");
             conn.Disconnect();
             return;
         }

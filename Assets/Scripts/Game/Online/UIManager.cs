@@ -177,7 +177,7 @@ public class UIManager : NetworkBehaviour {
     {
         if (success && matchInfoData != null)
         {
-            NetworkServer.Listen(matchInfoData, 9999);
+            NetworkServer.Listen(matchInfoData, 7777);
             NetworkManager.singleton.StartHost(matchInfoData);
         }
         else
