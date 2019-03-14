@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-
+using UnityEngine.Networking.Match;
 
 public class CustomNetManager : NetworkManager {
     public static CustomNetManager instance;
@@ -14,6 +14,7 @@ public class CustomNetManager : NetworkManager {
     private void Start()
     {
         instance = this;
+        UIManager.instance.gameObject.SetActive(true);
     }
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
@@ -23,6 +24,11 @@ public class CustomNetManager : NetworkManager {
         else
             MapOnline.instance.CmdGetMap();
 
+        if (players.Count < NetworkServer.connections.Count)
+        {
+            conn.Disconnect();
+            return;
+        }
         foreach (PlayerOnline player in players)
         {
             if (player.k == NetworkServer.connections.Count - 1)
@@ -32,11 +38,13 @@ public class CustomNetManager : NetworkManager {
             }
             player.RpcColorChange();
         }
-        UIManager.instance.RpcRoomInfo(netPlayers.Count, players.Count);
+        UIManager.instance.RpcRoomInfo(netPlayers.Count, players.Count, UIManager.instance.nameConnRoom);
 
         if (NetworkServer.connections.Count == players.Count)
         {
             StartCoroutine(TimerToStartGame());
+            foreach (PlayerOnline player in players)
+                player.notStop = true;
         }
     }
 
@@ -84,4 +92,5 @@ public class CustomNetManager : NetworkManager {
         }
         return cellUpsc;
    }
+   
 }

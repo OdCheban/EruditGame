@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -9,7 +10,10 @@ public class UIManager : NetworkBehaviour {
     public static UIManager instance;
     public NetworkManager manager;
 
+    public string nameConnRoom;
+
     [Header("UI:")]
+    public InputField textFieldRoom;
     public GameObject player_ui;
     public GameObject worldRoom_ui;
     public GameObject finish_ui;
@@ -44,10 +48,46 @@ public class UIManager : NetworkBehaviour {
         SceneManager.LoadScene("MenuScene");
     }
 
-    [ClientRpc]
-    public void RpcRoomInfo(int k,int maxK)
+    public Transform contentRoom;
+    public List<GameObject> listRoom;
+
+    public Text debugInfo;
+    private void Start()
     {
-        roomInfo.text = k + "/" + maxK + " Название_комнаты ";
+        manager = NetworkManager.singleton;
+        if (manager.matchMaker == null)
+        {
+            manager.StartMatchMaker();
+        }
+        RefreshRoom();
+    }
+
+
+    public void DeleteListRoom()
+    {
+        for (int i = 0; i < listRoom.Count; i++)
+            Destroy(listRoom[i]);
+        listRoom.Clear();
+    }
+    
+    public void CreateListRoom(string nameRoom,int size, int n, UnityEngine.Networking.Types.NetworkID id)
+    {
+        GameObject roomObj = (GameObject) Instantiate(Resources.Load("Element"),contentRoom);
+        Button btnRoom = roomObj.GetComponent<Button>();
+        btnRoom.onClick.AddListener(() => {
+            nameConnRoom = textFieldRoom.text;
+            NetworkManager.singleton.matchMaker.JoinMatch(id, "", "", "", 0, 0, OnjoinedMatch);
+            EnterRoom();
+        } );
+        Text txtRoom = roomObj.transform.GetChild(0).GetComponent<Text>();
+        txtRoom.text = nameRoom + ":" + n + "/" + size;
+        listRoom.Add(roomObj);
+    }
+
+    [ClientRpc]
+    public void RpcRoomInfo(int k,int maxK,string nameRoom)
+    {
+        roomInfo.text = k + "/" + maxK + " " + nameRoom;
     }
     [ClientRpc]
     public void RpcRoomChat(int sec)
@@ -66,13 +106,20 @@ public class UIManager : NetworkBehaviour {
     }
     public void CreateRoom()
     {
-        manager.StartHost();
+        Debug.Log("createRoom " + textFieldRoom.text);
+        CreateInternetMatch(textFieldRoom.text,DataGame.kPLayers);
+        nameConnRoom = textFieldRoom.text;
         EnterRoom();
     }
-    public void ConnectRoom()
+
+    public void RefreshRoom()
     {
-        manager.StartClient();
-        EnterRoom();
+        if (manager.matchMaker == null)
+        {
+            manager.StartMatchMaker();
+        }
+        DeleteListRoom();
+        GetListRoom();
     }
 
     public void LeaveRoom()
@@ -81,10 +128,11 @@ public class UIManager : NetworkBehaviour {
         worldRoom_ui.SetActive(true);
         room_ui.SetActive(false);
         player_ui.SetActive(false);
+        NetworkManager.singleton.StopHost();
     }
     void EnterRoom()
     {
-        Camera.main.transform.position = new Vector3(4, 0, -10);
+        Camera.main.transform.position = new Vector3(3, 0, -15);
         worldRoom_ui.SetActive(false);
         room_ui.SetActive(true);
         player_ui.SetActive(false);
@@ -117,5 +165,69 @@ public class UIManager : NetworkBehaviour {
         if (color == Color.blue)
             return "<color=#0000ffff>Синий</color>";
         return "???";
+    }
+
+    public void CreateInternetMatch(string matchName,uint sizeN)
+    {
+        Debug.Log("create " + matchName);
+        NetworkManager.singleton.matchMaker.CreateMatch(matchName, sizeN, true, "", "", "", 0, 0, OnMatchCreate);
+    }
+    //Create Match success calback
+    public void OnMatchCreate(bool success, string info, MatchInfo matchInfoData)
+    {
+        if (success && matchInfoData != null)
+        {
+            NetworkServer.Listen(matchInfoData, 9999);
+            NetworkManager.singleton.StartHost(matchInfoData);
+        }
+        else
+        {
+            LeaveRoom();
+            Debug.LogError("Create match failed : " + success + ", " + info);
+        }
+    }
+    public void FindInternetMatch(string matchName)
+    {
+        Debug.Log("Find " + matchName);
+        NetworkManager.singleton.matchMaker.ListMatches(0, 20, matchName, false, 0, 0, OnMatchListFound);
+    }
+    public void GetListRoom()
+    {
+        NetworkManager.singleton.matchMaker.ListMatches(0, 10, "", true, 0, 0, OnMatchListFound);
+    }
+    void OnMatchListFound(bool success, string info, List<MatchInfoSnapshot> matchInfoSnapshotLst)
+    {
+        foreach (MatchInfoSnapshot matchName in matchInfoSnapshotLst)
+            CreateListRoom(matchName.name,matchName.maxSize,matchName.currentSize,matchName.networkId);
+        if (success)
+        {
+            if (matchInfoSnapshotLst.Count != 0)
+            {
+                //Debug.Log("A list of matches was returned");
+                //join the last server (just in case there are two...)
+                //matchMaker.JoinMatch(matchInfoSnapshotLst[0].networkId, "", "", "", 0, 0, OnjoinedMatch);
+            }
+            else
+            {
+                // Debug.Log("No matches in requested room!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Couldn't connect to match maker");
+        }
+    }
+    void OnjoinedMatch(bool success, string info, MatchInfo matchInfoData)
+    {
+        Debug.Log("find " + info);
+        if (success)
+        {
+            //Debug.Log("Able to join a match");
+            NetworkManager.singleton.StartClient(matchInfoData);
+        }
+        else
+        {
+            Debug.LogError("Join match failed");
+        }
     }
 }

@@ -9,7 +9,7 @@ public class DataGame : MonoBehaviour {
     public static bool loadData;
     private static int _x;
     private static int _y;
-    public static Color[] colorPlayers = new Color[4] { Color.blue, Color.red,Color.green,Color.yellow };
+    public static Color[] colorPlayers = new Color[4] { Color.blue, Color.red, Color.green, Color.yellow };
     public static KeyCode[] key = new KeyCode[7] { KeyCode.D, KeyCode.A, KeyCode.S, KeyCode.W, KeyCode.Z, KeyCode.X, KeyCode.Q };
 
     public static string str_map
@@ -17,7 +17,7 @@ public class DataGame : MonoBehaviour {
         get
         {
             string str = "";
-            foreach(List<string> lst in map)
+            foreach (List<string> lst in map)
             {
                 foreach (string s in lst)
                     str += s + " ";
@@ -26,6 +26,17 @@ public class DataGame : MonoBehaviour {
         }
     }
     public static List<List<string>> map;
+    public static uint kPLayers
+    {
+        get {
+            uint k = 0;
+            foreach (List<string> lst in map)
+                foreach (string s in lst)
+                    if (s == "player")
+                        k++;
+            return k;
+        }
+    }
     public static List<string> abcResult;
     public static int maxJ
     {

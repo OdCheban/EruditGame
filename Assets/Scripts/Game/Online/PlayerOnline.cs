@@ -13,6 +13,7 @@ public class PlayerOnline : CellUp
 
     public bool connectIf;//возможность соед.
     [SyncVar] public bool move;
+    [SyncVar] public bool notStop;
     [SyncVar] public Vector2 velocity;
     [SyncVar] public bool processConnect;
     [SyncVar] public int k;
@@ -155,7 +156,7 @@ public class PlayerOnline : CellUp
 
     private void Update()
     {
-        if (isLocalPlayer)
+        if (isLocalPlayer && notStop)
         {
             if(!processConnect)
                 Controll();
