@@ -49,6 +49,7 @@ public class CustomNetManager : NetworkManager {
             k++;
             yield return new WaitForSeconds(1.0f);
         }
+        timer.StartTimer();
         UIManager.instance.RpcStartRoom();
     }
 

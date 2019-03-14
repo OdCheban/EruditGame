@@ -14,11 +14,6 @@ public class ControlScene : MonoBehaviour {
         instance = this;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            SceneManager.LoadScene("MenuScene");
-    }
     public void EndGame()
     {
         Time.timeScale = 0;
@@ -33,11 +28,5 @@ public class ControlScene : MonoBehaviour {
         if (color == Color.blue)
             return "<color=#0000ffff>Синий</color>";
         return "???";
-    }
-
-    public void MenuBtn()
-    {
-        Time.timeScale = 1;
-        SceneManager.LoadScene("Menu");
     }
 }

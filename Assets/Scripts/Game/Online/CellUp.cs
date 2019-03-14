@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+[NetworkSettings(channel = 0, sendInterval = 0.01f)]
 public class CellUp : NetworkBehaviour
 {
     [SyncVar] public string str;
@@ -68,8 +69,8 @@ public class CellUp : NetworkBehaviour
         PlayerOnline.instance.CmdNext(gameObject, iTarget + (int)velocity.x, jTarget + (int)velocity.y);
         if (hasArrived())
         {
-            PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
             NextCell(velocity);
+            PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
         }
     }
     public void NextCell(Vector2 velocity)
@@ -81,7 +82,7 @@ public class CellUp : NetworkBehaviour
         {
             if (MapOnline.instance.mapCells[nextI, nextJ].upCell == null)
             {
-                PlayerOnline.instance.CmdLeaveTo(gameObject, iPos,jPos);
+                PlayerOnline.instance.CmdLeaveTo(gameObject, iTarget, jTarget);
                 CellUp prev = PlayerOnline.instance.getPrev(this);
                 if (prev != null)
                     prev.FollowMe(iTarget, jTarget);
@@ -91,6 +92,17 @@ public class CellUp : NetworkBehaviour
         }
     }
 
+    public void FollowMe(int iTo, int jTo)
+    {
+        PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
+        PlayerOnline.instance.CmdTarget(gameObject, iTo, jTo);
+        PlayerOnline.instance.CmdOccupTo(gameObject, iTo, jTo);
+        CellUp prev = PlayerOnline.instance.getPrev(this);
+        if (prev != null)
+        {
+            prev.FollowMe(iTarget, jTarget);
+        }
+    }
     public CellUp Connect(Vector2 velocity)
     {
         int nextI = iTarget + (int)velocity.x;
@@ -101,17 +113,7 @@ public class CellUp : NetworkBehaviour
         PlayerOnline.instance.CmdTarget(cellUp.gameObject, nextI, nextJ);
         return cellUp;
     }
-    public void FollowMe(int iTo, int jTo)
-    {
-        PlayerOnline.instance.CmdPos(gameObject,iTarget, jTarget);
-        PlayerOnline.instance.CmdTarget(gameObject,iTo, jTo);
-        PlayerOnline.instance.CmdOccupTo(gameObject,iTo,jTo);
-        CellUp prev = PlayerOnline.instance.getPrev(this);
-        if (prev != null)
-        {
-            prev.FollowMe(iPos,jPos);
-        }
-    }
+
     public bool CheckNextAbc()
     {
         LoadDataNet ldn = MapOnline.instance.loadData;

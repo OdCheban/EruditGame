@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+[NetworkSettings(channel = 0, sendInterval = 0.01f)]
 public class PlayerOnline : CellUp
 {
     public static PlayerOnline instance;
@@ -17,6 +18,16 @@ public class PlayerOnline : CellUp
     [SyncVar] public int k;
 
     public List<CellUp> playerCells;
+    private float _score;
+    public float score
+    {
+        get { return _score; }
+        set
+        {
+            _score = value;
+            UIManager.instance.points_text.text = _score.ToString();
+        }
+    }
     CellUp playerHead
     {
         get { return playerCells.Last(); }
@@ -66,11 +77,11 @@ public class PlayerOnline : CellUp
         cellUp.nextJ = j;
     }
     [Command]
-    public void CmdPos(GameObject target, int i, int j)
+    public void CmdPos(GameObject target, int ii, int jj)
     {
-        CellUp cellUp = target.GetComponent<CellUp>();
-        cellUp.iPos = i;
-        cellUp.jPos = j;
+        CellUp cellTarget = target.GetComponent<CellUp>();
+        cellTarget.iPos = ii;
+        cellTarget.jPos = jj;
     }
     [Command]
     public void CmdTarget(GameObject target, int i, int j)
@@ -196,7 +207,6 @@ public class PlayerOnline : CellUp
         }
         if (Input.GetKeyDown(DataGame.key[4]) && connectIf)
         {
-            Debug.Log("5!");
             Connect();
         }
         if (Input.GetKeyDown(DataGame.key[5]))
@@ -242,7 +252,6 @@ public class PlayerOnline : CellUp
             UIManager.instance.add_img.fillAmount += MapOnline.instance.loadData.speedConnect;
             yield return new WaitForEndOfFrame();
         }
-        Debug.Log("!!!!");
         CmdConnect();
         CmdConnectCell(false);
         UIManager.instance.rem_btn.interactable = true;

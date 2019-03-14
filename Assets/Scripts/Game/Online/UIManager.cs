@@ -12,6 +12,8 @@ public class UIManager : NetworkBehaviour {
     [Header("UI:")]
     public GameObject player_ui;
     public GameObject worldRoom_ui;
+    public GameObject finish_ui;
+    public Text txtResult;
     public GameObject room_ui;
     public Text roomInfo;
     public Text roomChat;
@@ -21,7 +23,6 @@ public class UIManager : NetworkBehaviour {
     [HideInInspector] public Image rem_img;
     [HideInInspector] public Image add_img;
     public Text points_text;
-    public Text stateGame_text;
 
     private void Awake()
     {
@@ -89,5 +90,32 @@ public class UIManager : NetworkBehaviour {
         player_ui.SetActive(false);
     }
 
+    [Command]
+    public void CmdEndGame()
+    {
+        RpcEndGame();
+        CustomNetManager.instance.players.Sort((emp1, emp2)=>emp1.score.CompareTo(emp2.score));
+        for (int i = 0; i < CustomNetManager.instance.players.Count; i++)
+            RpcTableRecords(i, StrColor(DataGame.colorPlayers[CustomNetManager.instance.players[i].k]), CustomNetManager.instance.players[i].score);
+    }
+    [ClientRpc]
+    public void RpcEndGame()
+    {
+        player_ui.SetActive(false);
+        finish_ui.SetActive(true);
+    }
 
+    [ClientRpc]
+    public void RpcTableRecords(int i, string m, float score)
+    {
+        txtResult.text += i+")"+ m + " получил " + score + " очков!" + "\n";
+    }
+    private string StrColor(Color color)
+    {
+        if (color == Color.red)
+            return "<color=#ff0000ff>Красный</color>";
+        if (color == Color.blue)
+            return "<color=#0000ffff>Синий</color>";
+        return "???";
+    }
 }
