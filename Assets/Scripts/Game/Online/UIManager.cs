@@ -76,6 +76,7 @@ public class UIManager : NetworkBehaviour {
         Button btnRoom = roomObj.GetComponent<Button>();
         btnRoom.onClick.AddListener(() => {
             nameConnRoom = textFieldRoom.text;
+            NetworkServer.Listen(7777);
             NetworkManager.singleton.matchMaker.JoinMatch(id, "", "", "", 0, 0, OnjoinedMatch);
             EnterRoom();
         } );
@@ -107,6 +108,10 @@ public class UIManager : NetworkBehaviour {
     public void CreateRoom()
     {
         Debug.Log("createRoom " + textFieldRoom.text);
+        if (manager.matchMaker == null)
+        {
+            manager.StartMatchMaker();
+        }
         CreateInternetMatch(textFieldRoom.text,DataGame.kPLayers);
         nameConnRoom = textFieldRoom.text;
         EnterRoom();
@@ -142,9 +147,9 @@ public class UIManager : NetworkBehaviour {
     public void CmdEndGame()
     {
         RpcEndGame();
-        CustomNetManager.instance.players.Sort((emp1, emp2)=>emp1.score.CompareTo(emp2.score));
-        for (int i = 0; i < CustomNetManager.instance.players.Count; i++)
-            RpcTableRecords(i, StrColor(DataGame.colorPlayers[CustomNetManager.instance.players[i].k]), CustomNetManager.instance.players[i].score);
+        CustomNetManager.instance.playerss.Sort((emp1, emp2)=>emp1.score.CompareTo(emp2.score));
+        for (int i = 0; i < CustomNetManager.instance.playerss.Count; i++)
+            RpcTableRecords(i, StrColor(DataGame.colorPlayers[CustomNetManager.instance.playerss[i].k]), CustomNetManager.instance.playerss[i].score);
     }
     [ClientRpc]
     public void RpcEndGame()
@@ -170,6 +175,10 @@ public class UIManager : NetworkBehaviour {
     public void CreateInternetMatch(string matchName,uint sizeN)
     {
         Debug.Log("create " + matchName);
+        if (manager.matchMaker == null)
+        {
+            manager.StartMatchMaker();
+        }
         NetworkManager.singleton.matchMaker.CreateMatch(matchName, sizeN, true, "", "", "", 0, 0, OnMatchCreate);
     }
     //Create Match success calback
@@ -178,7 +187,8 @@ public class UIManager : NetworkBehaviour {
         if (success && matchInfoData != null)
         {
             NetworkServer.Listen(matchInfoData, 7777);
-            NetworkManager.singleton.StartHost(matchInfoData);
+            NetworkManager.singleton.networkPort = 7777;
+            NetworkManager.singleton.StartHost();
         }
         else
         {
@@ -222,8 +232,13 @@ public class UIManager : NetworkBehaviour {
         Debug.Log("find " + info);
         if (success)
         {
-            //Debug.Log("Able to join a match");
-            NetworkManager.singleton.StartClient(matchInfoData);
+            if (manager.matchMaker == null)
+            {
+                manager.StartMatchMaker();
+            }
+            MatchInfo hostInfo = matchInfoData;
+            NetworkManager.singleton.networkPort = 7777;
+            NetworkManager.singleton.StartClient();
         }
         else
         {

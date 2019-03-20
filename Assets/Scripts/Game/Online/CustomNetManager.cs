@@ -7,7 +7,7 @@ using UnityEngine.Networking.Match;
 
 public class CustomNetManager : NetworkManager {
     public static CustomNetManager instance;
-    public List<PlayerOnline> players = new List<PlayerOnline>();
+    public List<PlayerOnline> playerss = new List<PlayerOnline>();
     public List<NetworkConnection> netPlayers = new List<NetworkConnection>();
     public Timer timer;
 
@@ -19,32 +19,30 @@ public class CustomNetManager : NetworkManager {
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
+        Debug.Log("add player");
+        NetworkServer.AddPlayerForConnection(conn, playerss[NetworkServer.connections.Count - 1].gameObject, playerControllerId);
+        netPlayers.Add(conn);
+    }
+
+    public override void OnServerReady(NetworkConnection conn)
+    {
+        base.OnServerReady(conn);
+        Debug.Log("ready");
         if (NetworkServer.connections.Count == 1)
             MapOnline.instance.CmdCreateMap();
         else
             MapOnline.instance.CmdGetMap();
+        
 
-        if (players.Count < NetworkServer.connections.Count)
-        {
-            Debug.Log("discon!");
-            conn.Disconnect();
-            return;
-        }
-        foreach (PlayerOnline player in players)
-        {
-            if (player.k == NetworkServer.connections.Count - 1)
-            {
-                NetworkServer.AddPlayerForConnection(conn, player.gameObject, playerControllerId);
-                netPlayers.Add(conn);
-            }
+        foreach (PlayerOnline player in playerss)
             player.RpcColorChange();
-        }
-        UIManager.instance.RpcRoomInfo(netPlayers.Count, players.Count, UIManager.instance.nameConnRoom);
 
-        if (NetworkServer.connections.Count == players.Count)
+        UIManager.instance.RpcRoomInfo(netPlayers.Count, playerss.Count, UIManager.instance.nameConnRoom);
+
+        if (NetworkServer.connections.Count == playerss.Count)
         {
             StartCoroutine(TimerToStartGame());
-            foreach (PlayerOnline player in players)
+            foreach (PlayerOnline player in playerss)
                 player.notStop = true;
         }
     }
@@ -80,8 +78,8 @@ public class CustomNetManager : NetworkManager {
             {
                 cellUp = Instantiate(spawnPrefabs[2]);
                 PlayerOnline player = cellUp.GetComponent<PlayerOnline>();
-                player.k = players.Count;
-                players.Add(player);
+                player.k = playerss.Count;
+                playerss.Add(player);
             }
             else
             {

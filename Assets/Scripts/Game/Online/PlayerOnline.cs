@@ -197,6 +197,7 @@ public class PlayerOnline : CellUp
     void CmdRemovePlayerCells()
     {
         RpcRemoveCells();
+        RpcChangeTargetArrow();
     }
 
     [ClientRpc]
@@ -210,7 +211,7 @@ public class PlayerOnline : CellUp
             {
                 playerCells.RemoveAt(1);
             }
-            RpcChangeTargetArrow();
+            
             for (int i = 1; i < destrCell.Count; i++)
             {
                 destrCell[i].RpcDestroyCell();

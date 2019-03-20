@@ -385,7 +385,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u0412\u043E\u0439\u0442\u0438"
+  m_Text: "\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C"
 --- !u!222 &123143529
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1360,6 +1360,7 @@ MonoBehaviour:
     x: 0
     y: 0
     map: 
+    abc: 
   parent: {fileID: 29833018}
   players: []
 --- !u!114 &994103690
@@ -2058,7 +2059,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 588268192}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2295,7 +2296,7 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
-  m_AllowMSAA: 1
+  m_AllowMSAA: 0
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
@@ -3606,7 +3607,8 @@ MonoBehaviour:
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
   m_LogLevel: 2
-  m_PlayerPrefab: {fileID: 0}
+  m_PlayerPrefab: {fileID: 1223944442226382, guid: 63b575f489e888a4195a265c467b9173,
+    type: 2}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
   m_OfflineScene: 
@@ -3670,7 +3672,7 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
-  players: []
+  playerss: []
   timer: {fileID: 323796673}
 --- !u!1 &1996892530
 GameObject:

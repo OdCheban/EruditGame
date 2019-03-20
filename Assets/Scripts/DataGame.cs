@@ -116,7 +116,12 @@ public class DataGame : MonoBehaviour {
 
     public static void ReadDictonaryFromFile()
     {
-        StreamReader objReader = new StreamReader(Application.dataPath + "/dictonary.txt");
+#if !UNITY_EDITOR
+        string parentDirectory = Path.GetDirectoryName(Application.dataPath) + "/dictonary.txt";
+#else
+        string parentDirectory = Application.dataPath+ "/dictonary.txt";
+#endif
+        StreamReader objReader = new StreamReader(parentDirectory);
         string sLine = "";
         while (sLine != null)
         {
