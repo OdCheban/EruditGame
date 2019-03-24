@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LoadData : MonoBehaviour {
-
-	void Start ()
+public class LoadData : MonoBehaviour
+{
+    void Start()
     {
         if (!DataGame.loadData)
         {
@@ -11,6 +12,7 @@ public class LoadData : MonoBehaviour {
             DataGame.LoadData();
         }
     }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))

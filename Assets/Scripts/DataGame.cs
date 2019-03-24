@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
 
-public class DataGame : MonoBehaviour {
+public class DataGame : MonoBehaviour
+{
     public static bool loadData;
     private static int _x;
     private static int _y;
@@ -28,7 +30,8 @@ public class DataGame : MonoBehaviour {
     public static List<List<string>> map;
     public static uint kPLayers
     {
-        get {
+        get
+        {
             uint k = 0;
             foreach (List<string> lst in map)
                 foreach (string s in lst)
@@ -58,7 +61,7 @@ public class DataGame : MonoBehaviour {
     public static float xBonus;
     public static float sizeBtn = 1.0f;
 
-    public static Dictionary<char,int> ABCscore = new Dictionary<char, int>() {
+    public static Dictionary<char, int> ABCscore = new Dictionary<char, int>() {
         { 'а', 1 },
         { 'б', 3 },
         { 'в', 2 },
@@ -102,11 +105,11 @@ public class DataGame : MonoBehaviour {
                    (i != 0 || j != jMax - 1) &&
                    (i != iMax - 1 || j != jMax - 1));
     }
-    public static bool ExitRangeGame(int i, int j, int maxI = -1,int maxJ = -1)
+    public static bool ExitRangeGame(int i, int j, int maxI = -1, int maxJ = -1)
     {
         int iMax = DataGame.maxI;
         int jMax = DataGame.maxJ;
-        if(maxI != -1)
+        if (maxI != -1)
         {
             iMax = maxI;
             jMax = maxJ;
@@ -116,40 +119,31 @@ public class DataGame : MonoBehaviour {
 
     public static void ReadDictonaryFromFile()
     {
-#if !UNITY_EDITOR
-        string parentDirectory = Path.GetDirectoryName(Application.dataPath) + "/dictonary.txt";
-#else
-        string parentDirectory = Application.dataPath+ "/dictonary.txt";
-#endif
-        StreamReader objReader = new StreamReader(parentDirectory);
-        string sLine = "";
-        while (sLine != null)
-        {
-            sLine = objReader.ReadLine();
-            if (sLine != null && sLine.Length > 1)
-            {
-                abc.Add(sLine);
-            }
-        }
+        TextAsset txtAsset = (TextAsset)Resources.Load("dictonary");
+        string[] tt = txtAsset.text.Split('\n');
+        for (int i = 0; i < tt.Length; i++)
+            abc.Add(tt[i].Trim());
     }
 
     public static void LoadData()
     {
-        maxI = PlayerPrefs.GetInt("x", 5);
-        maxJ = PlayerPrefs.GetInt("y", 5);
-        modeMove = PlayerPrefs.GetInt("move", 0);
-        timeExit = PlayerPrefs.GetInt("timeExit", 2);
-        timeGame = PlayerPrefs.GetFloat("timeGame", 60);
-        speed = PlayerPrefs.GetFloat("speed", 1.5f);
-        speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
-        speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
-        speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
-        xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
-        abcResult = PlayerPrefs.GetString("words", "").Split(' ','\n').ToList();
-        string m = PlayerPrefs.GetString("map", "");
-        if (m == "")
+        try
         {
-            map = new List<List<string>>()
+            maxI = PlayerPrefs.GetInt("x", 5);
+            maxJ = PlayerPrefs.GetInt("y", 5);
+            modeMove = PlayerPrefs.GetInt("move", 0);
+            timeExit = PlayerPrefs.GetInt("timeExit", 2);
+            timeGame = PlayerPrefs.GetFloat("timeGame", 60);
+            speed = PlayerPrefs.GetFloat("speed", 1.5f);
+            speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
+            speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
+            speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
+            xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
+            abcResult = PlayerPrefs.GetString("words", "").Split(' ', '\n').ToList();
+            string m = PlayerPrefs.GetString("map", "");
+            if (m == "")
+            {
+                map = new List<List<string>>()
             {
                 new List<string>() { "null", "null", "null", "null", "null" },
                 new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
@@ -159,15 +153,20 @@ public class DataGame : MonoBehaviour {
                 new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
                 new List<string>() { "null", "null", "null", "null", "null" }
             };
+            }
+            else
+            {
+                map = StrToListMap(m, maxI, maxJ);
+            }
+            DataGame.loadData = true;
         }
-        else
+        catch (Exception ex)
         {
-            map = StrToListMap(m,maxI,maxJ);
+            DebugUI.instance.SetText("3");
         }
-        DataGame.loadData = true;
     }
 
-    public static List<List<string>> StrToListMap(string str,int x, int y)
+    public static List<List<string>> StrToListMap(string str, int x, int y)
     {
         string[] mm = str.Split(' ');
         List<List<string>> m_map = new List<List<string>>();
@@ -179,8 +178,8 @@ public class DataGame : MonoBehaviour {
             {
                 //if (ExitRange(i, j, x, y))
                 //{
-                    strLine.Add(mm[k]);
-                    k++;
+                strLine.Add(mm[k]);
+                k++;
                 //}
             }
             m_map.Add(strLine);

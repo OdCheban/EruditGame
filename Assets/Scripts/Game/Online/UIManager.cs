@@ -188,7 +188,7 @@ public class UIManager : NetworkBehaviour {
         {
             NetworkServer.Listen(matchInfoData, 7777);
             NetworkManager.singleton.networkPort = 7777;
-            NetworkManager.singleton.StartHost();
+            NetworkManager.singleton.StartHost(matchInfoData);
         }
         else
         {
@@ -236,9 +236,8 @@ public class UIManager : NetworkBehaviour {
             {
                 manager.StartMatchMaker();
             }
-            MatchInfo hostInfo = matchInfoData;
             NetworkManager.singleton.networkPort = 7777;
-            NetworkManager.singleton.StartClient();
+            NetworkManager.singleton.StartClient(matchInfoData);
         }
         else
         {

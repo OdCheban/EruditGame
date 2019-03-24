@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Text;
 using System.Text.RegularExpressions;
+using System;
 
 public class EditScene : MonoBehaviour {
 
