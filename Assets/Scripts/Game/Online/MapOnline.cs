@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 [System.Serializable]
 public struct LoadDataNet
 {
+    public float timeExit;
     public float speed;
     public float speedVagon;
     public float speedDisconnect;
@@ -68,30 +69,68 @@ public class MapOnline : NetworkBehaviour
             loadData.speedDisconnect = DataGame.speedDisconnect;
             loadData.speedConnect = DataGame.speedConnect;
             loadData.speedVagon = DataGame.speedVagon;
+            loadData.timeExit = DataGame.timeExit;
             foreach (string d in DataGame.abcResult)
                 loadData.abc += d + " ";
         }
     }
 
     [Command]
+    public void CmdRoomInfo(int k, int maxK, string nameRoom)
+    {
+        RpcRoomInfo(k, maxK, nameRoom);
+    }
+
+    [ClientRpc]
+    public void RpcRoomInfo(int k, int maxK, string nameRoom)
+    {
+        UIManager.instance.roomInfo.text = k + "/" + maxK + " " + nameRoom;
+    }
+
+    [ClientRpc]
+    public void RpcStartRoom()
+    {
+        UIManager.instance.StartRoom();
+    }
+    [ClientRpc]
+    public void RpcRoomChat(int k)
+    {
+        UIManager.instance.RoomChat(k);
+    }
+    [Command]
     public void CmdGetMap()
     {
         NetworkConnection target = NetworkServer.connections[NetworkServer.connections.Count - 1];
-        for (int i = 0; i < loadData.x; i++)
-            for (int j = 0; j < loadData.y; j++)
-                TargetGetMap(target, mapCells[i,j].gameObject, (mapCells[i, j].upCell)?mapCells[i,j].upCell.gameObject:null,i,j);
+        TargetGetMap(target);
         abcList = loadData.abc.Split(' ').ToList();
     }
 
     [TargetRpc]
-    public void TargetGetMap(NetworkConnection target, GameObject cell,GameObject upCell,int i,int j)
+    public void TargetGetMap(NetworkConnection target)
     {
-        if(i+j == 0) mapCells = new CellGameOnline[loadData.x, loadData.y];
-        mapCells[i, j] = cell.GetComponent<CellGameOnline>();
-        if (upCell != null)
+        int kChild = 0;
+        mapCells = new CellGameOnline[loadData.x, loadData.y];
+        for (int i = 0; i < loadData.x; i++)
         {
-            mapCells[i, j].upCell = upCell.GetComponent<CellUp>();
-            mapCells[i, j].upCell.TextRefresh();
+            for (int j = 0; j < loadData.y; j++)
+            {
+                GameObject child = parent.GetChild(kChild).gameObject;
+                if(child.GetComponent<CellGameOnline>())
+                {
+                    kChild++;
+                    mapCells[i, j] = child.GetComponent<CellGameOnline>();
+                }
+                if (kChild < parent.childCount)
+                {
+                    child = parent.GetChild(kChild).gameObject;
+                    if (child.GetComponent<CellUp>())
+                    {
+                        kChild++;
+                        mapCells[i, j].upCell = child.GetComponent<CellUp>();
+                        mapCells[i, j].upCell.TextRefresh();
+                    }
+                }
+            }
         }
         abcList = loadData.abc.Split(' ').ToList();
     }
@@ -101,7 +140,6 @@ public class MapOnline : NetworkBehaviour
     {
         CreateMap();
         StartPositionCell();
-
     }
 
     //создаем карту пустых клеток
@@ -110,11 +148,13 @@ public class MapOnline : NetworkBehaviour
         List<List<string>> mapStr = DataGame.StrToListMap(loadData.map, loadData.x, loadData.y);
         mapCells = new CellGameOnline[loadData.x,loadData.y];
         for (int i = 0; i < loadData.x; i++)
+        {
             for (int j = 0; j < loadData.y; j++)
             {
-                mapCells[i, j] = CustomNetManager.instance.CreateGOonlineCell(mapStr[i][j]);
+                mapCells[i, j] = CustomNetManager.instance.CreateGOonlineCell();
                 mapCells[i, j].upCell = CustomNetManager.instance.CreateGOonlineCellUp(mapStr[i][j], i, j);
             }
+        }
     }
     
     void StartPositionCell()

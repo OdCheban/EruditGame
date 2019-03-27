@@ -3,48 +3,61 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Networking.Match;
 
 public class CustomNetManager : NetworkManager {
     public static CustomNetManager instance;
+    public UIManager uimanager;
     public List<PlayerOnline> playerss = new List<PlayerOnline>();
     public List<NetworkConnection> netPlayers = new List<NetworkConnection>();
     public Timer timer;
+    public bool readyLastPlayers;
 
     private void Start()
     {
         instance = this;
-        UIManager.instance.gameObject.SetActive(true);
+        if (matchMaker == null)
+            StartMatchMaker();
+        uimanager.RefreshRoom();
     }
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        Debug.Log("add player");
+        if (NetworkServer.connections.Count == 1)
+            MapOnline.instance.CmdCreateMap();
         NetworkServer.AddPlayerForConnection(conn, playerss[NetworkServer.connections.Count - 1].gameObject, playerControllerId);
         netPlayers.Add(conn);
+        readyLastPlayers = true;
     }
+
+
 
     public override void OnServerReady(NetworkConnection conn)
     {
-        base.OnServerReady(conn);
-        Debug.Log("ready");
-        if (NetworkServer.connections.Count == 1)
-            MapOnline.instance.CmdCreateMap();
-        else
-            MapOnline.instance.CmdGetMap();
-        
+        readyLastPlayers = false;
 
+        if (NetworkServer.connections.Count > playerss.Count+1)
+        {
+            conn.Disconnect();
+            DebugUI.instance.SetText("disconnect users by range");
+        }
+        StartCoroutine(WaitReadyLastPlayers());
+        base.OnServerReady(conn);
+    }
+
+    IEnumerator WaitReadyLastPlayers()
+    {
+        while (!readyLastPlayers)
+            yield return new WaitForSeconds(1.0f);
+        Debug.Log("readyPlayer");
+        if (NetworkServer.connections.Count > 1)
+            MapOnline.instance.CmdGetMap();
         foreach (PlayerOnline player in playerss)
             player.RpcColorChange();
 
-        UIManager.instance.RpcRoomInfo(netPlayers.Count, playerss.Count, UIManager.instance.nameConnRoom);
+        MapOnline.instance.CmdRoomInfo(netPlayers.Count, playerss.Count, uimanager.nameConnRoom);//error
 
         if (NetworkServer.connections.Count == playerss.Count)
-        {
             StartCoroutine(TimerToStartGame());
-            foreach (PlayerOnline player in playerss)
-                player.notStop = true;
-        }
     }
 
     IEnumerator TimerToStartGame()
@@ -52,15 +65,17 @@ public class CustomNetManager : NetworkManager {
         int k = 0;
         while (k < DataGame.timeExit)
         {
-            UIManager.instance.RpcRoomChat((int)DataGame.timeExit - k);
+            MapOnline.instance.RpcRoomChat((int)DataGame.timeExit - k);
             k++;
             yield return new WaitForSeconds(1.0f);
         }
+        foreach (PlayerOnline player in playerss)
+            player.notStop = true;
         timer.StartTimer();
-        UIManager.instance.RpcStartRoom();
+        MapOnline.instance.RpcStartRoom();
     }
 
-    public CellGameOnline CreateGOonlineCell(string m)
+    public CellGameOnline CreateGOonlineCell()
     {
         GameObject cellGO = Instantiate(spawnPrefabs[0]);
         NetworkServer.Spawn(cellGO);

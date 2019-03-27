@@ -127,23 +127,21 @@ public class DataGame : MonoBehaviour
 
     public static void LoadData()
     {
-        try
+        maxI = PlayerPrefs.GetInt("x", 5);
+        maxJ = PlayerPrefs.GetInt("y", 5);
+        modeMove = PlayerPrefs.GetInt("move", 0);
+        timeExit = PlayerPrefs.GetInt("timeExit", 2);
+        timeGame = PlayerPrefs.GetFloat("timeGame", 60);
+        speed = PlayerPrefs.GetFloat("speed", 1.5f);
+        speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
+        speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
+        speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
+        xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
+        abcResult = PlayerPrefs.GetString("words", "").Split(' ', '\n').ToList();
+        string m = PlayerPrefs.GetString("map", "");
+        if (m == "")
         {
-            maxI = PlayerPrefs.GetInt("x", 5);
-            maxJ = PlayerPrefs.GetInt("y", 5);
-            modeMove = PlayerPrefs.GetInt("move", 0);
-            timeExit = PlayerPrefs.GetInt("timeExit", 2);
-            timeGame = PlayerPrefs.GetFloat("timeGame", 60);
-            speed = PlayerPrefs.GetFloat("speed", 1.5f);
-            speedVagon = PlayerPrefs.GetFloat("speedVagon", 0.2f);
-            speedConnect = PlayerPrefs.GetFloat("speedConnect", .03f);
-            speedDisconnect = PlayerPrefs.GetFloat("speedDisconnect", .03f);
-            xBonus = PlayerPrefs.GetFloat("xBonus", 1.5f);
-            abcResult = PlayerPrefs.GetString("words", "").Split(' ', '\n').ToList();
-            string m = PlayerPrefs.GetString("map", "");
-            if (m == "")
-            {
-                map = new List<List<string>>()
+            map = new List<List<string>>()
             {
                 new List<string>() { "null", "null", "null", "null", "null" },
                 new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
@@ -153,17 +151,12 @@ public class DataGame : MonoBehaviour
                 new List<string>() { "null", "cell", "cell", "cell", "cell", "cell", "null" },
                 new List<string>() { "null", "null", "null", "null", "null" }
             };
-            }
-            else
-            {
-                map = StrToListMap(m, maxI, maxJ);
-            }
-            DataGame.loadData = true;
         }
-        catch (Exception ex)
+        else
         {
-            DebugUI.instance.SetText("3");
+            map = StrToListMap(m, maxI, maxJ);
         }
+        DataGame.loadData = true;
     }
 
     public static List<List<string>> StrToListMap(string str, int x, int y)

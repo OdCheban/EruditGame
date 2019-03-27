@@ -52,13 +52,11 @@ public class UIManager : NetworkBehaviour {
     public List<GameObject> listRoom;
 
     public Text debugInfo;
-    private void Start()
+    public void Start()
     {
         manager = NetworkManager.singleton;
         if (manager.matchMaker == null)
-        {
             manager.StartMatchMaker();
-        }
         RefreshRoom();
     }
 
@@ -84,19 +82,13 @@ public class UIManager : NetworkBehaviour {
         txtRoom.text = nameRoom + ":" + n + "/" + size;
         listRoom.Add(roomObj);
     }
-
-    [ClientRpc]
-    public void RpcRoomInfo(int k,int maxK,string nameRoom)
-    {
-        roomInfo.text = k + "/" + maxK + " " + nameRoom;
-    }
-    [ClientRpc]
-    public void RpcRoomChat(int sec)
+    
+    public void RoomChat(int sec)
     {
         roomChat.text += "сервер:" + sec+ "..." +"\n";
     }
-    [ClientRpc]
-    public void RpcStartRoom()
+
+    public void StartRoom()
     {
         Camera.main.transform.position = new Vector3(0, 0, -10);
         worldRoom_ui.SetActive(false);
