@@ -15,8 +15,13 @@ public class CellGameOnline : NetworkBehaviour
         transform.SetParent(MapOnline.instance.parent);
     }
     [ClientRpc]
-    public void RpcOccup(GameObject cell)
+    public void RpcOccup(NetworkInstanceId objId)
     {
+        GameObject cell;
+        if (isClient)
+            cell = ClientScene.FindLocalObject(objId);
+        else
+            cell = NetworkServer.FindLocalObject(objId);
         upCell = cell.GetComponent<CellUp>();
         GetComponent<Image>().color = Color.gray;
     }

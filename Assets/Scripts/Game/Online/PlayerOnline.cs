@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-[NetworkSettings(channel = 0, sendInterval = 0.01f)]
+
 public class PlayerOnline : CellUp
 {
     public static PlayerOnline instance;
@@ -163,11 +163,13 @@ public class PlayerOnline : CellUp
             if (move)
             {
                 playerHead.MoveNext(velocity);
-                CmdMovePlayer();
+                
             }
             UIManager.instance.add_btn.interactable = connectIf = playerHead.CheckNextAbc();
             LetterExitCheck();
         }
+        if (move && notStop)
+            MovePlayer();
         UpdateRotArrow();
     }
     string WordPlayer()
@@ -222,12 +224,11 @@ public class PlayerOnline : CellUp
         }
     }
 
-
-    [Command]
-    void CmdMovePlayer()
+    
+    void MovePlayer()
     {
         foreach (CellUp player in playerCells)
-            player.RpcMoveToTarget(speed);
+            player.MoveToTarget(speed);
     }
     void Controll()
     {
@@ -319,9 +320,10 @@ public class PlayerOnline : CellUp
     }
 
     [Command]
-    public void CmdOccupTo(GameObject obj, int i, int j)
+    public void CmdOccupTo(NetworkInstanceId objId, int i, int j)
     {
-        MapOnline.instance.mapCells[i, j].RpcOccup(obj);
+        Debug.Log("cmdOccup");
+        MapOnline.instance.mapCells[i, j].RpcOccup(objId);
     }
     [Command]
     public void CmdLeaveTo(GameObject obj, int i, int j)

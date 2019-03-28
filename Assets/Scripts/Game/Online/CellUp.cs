@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-[NetworkSettings(channel = 0, sendInterval = 0.01f)]
+
 public class CellUp : NetworkBehaviour
 {
     [SyncVar] public string str;
@@ -54,12 +54,12 @@ public class CellUp : NetworkBehaviour
         if (m != "") str = m;
         textUI.text = str;
     }
-
-    [ClientRpc]
-    public void RpcMoveToTarget(float speed)
+    
+    public void MoveToTarget(float speed)
     {
         position = Vector2.MoveTowards(position, MapOnline.instance.mapCells[iTarget,jTarget].transform.position, speed * Time.deltaTime);
     }
+
     public bool hasArrived()
     {
         LoadDataNet ldn = MapOnline.instance.loadData;
@@ -94,7 +94,7 @@ public class CellUp : NetworkBehaviour
                 if (prev != null)
                     prev.FollowMe(iTarget, jTarget);
                 PlayerOnline.instance.CmdTarget(gameObject,nextI, nextJ);
-                PlayerOnline.instance.CmdOccupTo(gameObject,nextI, nextJ);
+                PlayerOnline.instance.CmdOccupTo(gameObject.GetComponent<NetworkIdentity>().netId, nextI, nextJ);
             }
         }
     }
@@ -103,7 +103,7 @@ public class CellUp : NetworkBehaviour
     {
         PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
         PlayerOnline.instance.CmdTarget(gameObject, iTo, jTo);
-        PlayerOnline.instance.CmdOccupTo(gameObject, iTo, jTo);
+        PlayerOnline.instance.CmdOccupTo(gameObject.GetComponent<NetworkIdentity>().netId, iTo, jTo);
         CellUp prev = PlayerOnline.instance.getPrev(this);
         if (prev != null)
         {
@@ -154,7 +154,7 @@ public class CellUp : NetworkBehaviour
         if (unConnect)
         {
             if (!hasArrived())
-                RpcMoveToTarget(MapOnline.instance.loadData.speed);
+                MoveToTarget(MapOnline.instance.loadData.speed);
             else
             {
                 PlayerOnline.instance.CmdUnConnectEnd(gameObject, iTarget, jTarget);
