@@ -66,23 +66,44 @@ public class PlayerOnline : CellUp
     [Command]
     public void CmdNext(GameObject target, int i, int j)
     {
-        CellUp cellUp = target.GetComponent<CellUp>();
-        cellUp.nextI = i;
-        cellUp.nextJ = j;
+        try
+        {
+            CellUp cellUp = target.GetComponent<CellUp>();
+            cellUp.nextI = i;
+            cellUp.nextJ = j;
+        }
+        catch
+        {
+
+        }
     }
     [Command]
     public void CmdPos(GameObject target, int ii, int jj)
     {
+        try
+        { 
         CellUp cellTarget = target.GetComponent<CellUp>();
         cellTarget.iPos = ii;
         cellTarget.jPos = jj;
+        }
+        catch
+        {
+
+        }
     }
     [Command]
     public void CmdTarget(GameObject target, int i, int j)
     {
+        try
+        {
         CellUp cellUp = target.GetComponent<CellUp>();
         cellUp.iTarget = i;
         cellUp.jTarget = j;
+        }
+        catch
+        {
+
+        }
     }
 
     [Command]
