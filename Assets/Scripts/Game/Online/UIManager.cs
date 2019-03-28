@@ -45,6 +45,7 @@ public class UIManager : NetworkBehaviour {
 
     public void Exit()
     {
+        NetworkManager.singleton.StopMatchMaker();
         SceneManager.LoadScene("MenuScene");
     }
 
@@ -211,7 +212,7 @@ public class UIManager : NetworkBehaviour {
             }
             else
             {
-                // Debug.Log("No matches in requested room!");
+                Debug.Log("No matches in requested room!");
             }
         }
         else
@@ -219,9 +220,10 @@ public class UIManager : NetworkBehaviour {
             Debug.LogError("Couldn't connect to match maker");
         }
     }
+
+    public float timerConnect;
     void OnjoinedMatch(bool success, string info, MatchInfo matchInfoData)
     {
-        Debug.Log("find " + info);
         if (success)
         {
             if (manager.matchMaker == null)
@@ -229,6 +231,7 @@ public class UIManager : NetworkBehaviour {
                 manager.StartMatchMaker();
             }
             NetworkManager.singleton.networkPort = 7777;
+            Debug.Log("start");
             NetworkManager.singleton.StartClient(matchInfoData);
         }
         else

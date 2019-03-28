@@ -50,6 +50,7 @@ public class EditScene : MonoBehaviour {
     {
         string m = string.Empty;
         foreach (Cell cell in cells)
+            if(cell.text.Length == 1)
                 m += cell.text;
         return m;
     }
@@ -66,10 +67,13 @@ public class EditScene : MonoBehaviour {
             foreach (var letter in word)
             {
                 if (!letters.Contains(letter.ToString()))
+                {
                     isFound = false;
+                    break;
+                }
             }
 
-            if (isFound)
+            if (isFound && word.Length <= letters.Length)
             {
                 k++;
                 str.Append(word + " ");

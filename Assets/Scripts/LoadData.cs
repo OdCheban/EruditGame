@@ -11,6 +11,7 @@ public class LoadData : MonoBehaviour
             DataGame.ReadDictonaryFromFile();
             DataGame.LoadData();
         }
+        if (DataGame.abcResult.Contains("ма") || DataGame.abcResult.Contains("ам")) Debug.Log("hi");
     }
 
     private void Update()

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
+[NetworkSettings(channel = 0, sendInterval = 0)]
 public class PlayerOnline : CellUp
 {
     public static PlayerOnline instance;
@@ -19,16 +19,8 @@ public class PlayerOnline : CellUp
     [SyncVar] public int k;
 
     public List<CellUp> playerCells;
-    private float _score;
-    public float score
-    {
-        get { return _score; }
-        set
-        {
-            _score = value;
-            UIManager.instance.points_text.text = _score.ToString();
-        }
-    }
+    [SyncVar] public float score;
+
     CellUp playerHead
     {
         get { return playerCells.Last(); }
@@ -42,7 +34,7 @@ public class PlayerOnline : CellUp
     {
         get
         {
-            LoadDataNet load =  MapOnline.instance.loadData;
+            LoadDataNet load = MapOnline.instance.loadData;
             return (DataGame.sizeBtn) / (load.speed + (playerCells.Count - 1) * load.speedVagon);
         }
     }
@@ -57,15 +49,16 @@ public class PlayerOnline : CellUp
     {
         if (isLocalPlayer) instance = this;
     }
-    
+
     [Command]
     public void CmdUnConnectEnd(GameObject target, int i, int j)
     {
-        RpcUnConnectEnd(target, i, j);
+        RpcUnConnectEnd(target.GetComponent<NetworkIdentity>().netId, i, j);
     }
     [ClientRpc]
-    public void RpcUnConnectEnd(GameObject target, int i, int j)
+    public void RpcUnConnectEnd(NetworkInstanceId objId, int i, int j)
     {
+        GameObject target = (isClient) ? ClientScene.FindLocalObject(objId) : NetworkServer.FindLocalObject(objId);
         MapOnline.instance.mapCells[i, j].upCell = target.GetComponent<CellUp>();
         MapOnline.instance.mapCells[i, j].upCell.unConnect = false;
     }
@@ -102,6 +95,7 @@ public class PlayerOnline : CellUp
     public void CmdDisconnect()
     {
         playerCells.Last().RpcDisconnectCell();
+        playerCells.Last().player = false;
         RpcDisconnect();
         RpcChangeTargetArrow();
     }
@@ -113,13 +107,16 @@ public class PlayerOnline : CellUp
     [Command]
     public void CmdConnect()
     {
+        //отцепиться
         GameObject newVagon = playerHead.Connect(velocity).gameObject;
-        RpcConnect(newVagon);
+        newVagon.GetComponent<CellUp>().player = true;
+        RpcConnect(newVagon.GetComponent<NetworkIdentity>().netId);
         RpcChangeTargetArrow();
     }
     [ClientRpc]
-    public void RpcConnect(GameObject obj)
+    public void RpcConnect(NetworkInstanceId objId)
     {
+        GameObject obj = (isClient) ? ClientScene.FindLocalObject(objId) : NetworkServer.FindLocalObject(objId);
         playerCells.Add(obj.GetComponent<CellUp>());
         obj.transform.SetAsLastSibling();
         playerHead.GetComponent<Image>().color = icon.color;
@@ -145,7 +142,7 @@ public class PlayerOnline : CellUp
     [Command]
     void CmdConnectCell(bool flag)
     {
-        MapOnline.instance.mapCells[nextI,nextJ].connectProcess = flag;
+        MapOnline.instance.mapCells[nextI, nextJ].connectProcess = flag;
     }
 
     [Command]
@@ -158,15 +155,14 @@ public class PlayerOnline : CellUp
     {
         if (isLocalPlayer && notStop)
         {
-            if(!processConnect)
+            if (!processConnect)
                 Controll();
             if (move)
-            {
                 playerHead.MoveNext(velocity);
-                
-            }
+            CmdLetterExitCheck();
             UIManager.instance.add_btn.interactable = connectIf = playerHead.CheckNextAbc();
-            LetterExitCheck();
+            UIManager.instance.rem_btn.interactable = (playerCells.Count > 2) ? true : false;
+            UIManager.instance.points_text.text = score.ToString();
         }
         if (move && notStop)
             MovePlayer();
@@ -180,7 +176,8 @@ public class PlayerOnline : CellUp
         return m.ToLower();
     }
 
-    void LetterExitCheck()
+    [Command]
+    void CmdLetterExitCheck()
     {
         if (playerHead.ExitABC())
             foreach (string resultWords in MapOnline.instance.abcList)
@@ -198,33 +195,22 @@ public class PlayerOnline : CellUp
     [Command]
     void CmdRemovePlayerCells()
     {
+        List<CellUp> destrCell = new List<CellUp>(playerCells);
         RpcRemoveCells();
         RpcChangeTargetArrow();
+        for (int i = 1; i < destrCell.Count; i++)
+            destrCell[i].CmdDestroyCell();
     }
 
     [ClientRpc]
     void RpcRemoveCells()
     {
-        try
-        {
-            List<CellUp> destrCell = new List<CellUp>(playerCells);
-            int k = playerCells.Count;
-            for (int i = 1; i < k; i++)
-            {
-                playerCells.RemoveAt(1);
-            }
-            
-            for (int i = 1; i < destrCell.Count; i++)
-            {
-                destrCell[i].RpcDestroyCell();
-            }
-        }catch
-        {
-            Debug.Log("error");
-        }
+        int k = playerCells.Count;
+        for (int i = 1; i < k; i++)
+            playerCells.RemoveAt(1);
     }
 
-    
+
     void MovePlayer()
     {
         foreach (CellUp player in playerCells)
@@ -249,7 +235,7 @@ public class PlayerOnline : CellUp
             if (Input.GetKeyDown(DataGame.key[3]))
             {
                 if (velocity != new Vector2(0, 1))
-                    CmdVel(new Vector2(0,-1));
+                    CmdVel(new Vector2(0, -1));
                 else return;
             }
             if (Input.GetKeyDown(DataGame.key[2]))
@@ -322,7 +308,6 @@ public class PlayerOnline : CellUp
     [Command]
     public void CmdOccupTo(NetworkInstanceId objId, int i, int j)
     {
-        Debug.Log("cmdOccup");
         MapOnline.instance.mapCells[i, j].RpcOccup(objId);
     }
     [Command]

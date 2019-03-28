@@ -13,6 +13,6 @@ public class DebugUI : MonoBehaviour {
     }
     public void SetText(string m)
     {
-        txt.text += m + "\n";
+        txt.text += m;
     }
 }

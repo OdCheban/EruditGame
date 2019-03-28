@@ -156,7 +156,7 @@ public class DataGame : MonoBehaviour
         {
             map = StrToListMap(m, maxI, maxJ);
         }
-        DataGame.loadData = true;
+        loadData = true;
     }
 
     public static List<List<string>> StrToListMap(string str, int x, int y)

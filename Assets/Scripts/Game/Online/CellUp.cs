@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
+[NetworkSettings(channel = 0, sendInterval = 0)]
 public class CellUp : NetworkBehaviour
 {
     [SyncVar] public string str;
@@ -17,6 +17,8 @@ public class CellUp : NetworkBehaviour
     [SyncVar] public int jPos;
     [SyncVar] public int iTarget;
     [SyncVar] public int jTarget;
+    [SyncVar] public bool player;
+    [SyncVar] public bool destroy;
 
     private void Awake()
     {
@@ -35,11 +37,12 @@ public class CellUp : NetworkBehaviour
         jPos = jTarget = j;
         TextRefresh(typeStr);
     }
-    [ClientRpc]
-    public void RpcDestroyCell()
+    [Command]
+    public void CmdDestroyCell()
     {
         iPos = iTarget;
         jPos = jTarget;
+        destroy = true;
         MapOnline.instance.mapCells[iPos, jPos].RpcLeave();
         NetworkServer.Destroy(gameObject);
     }
@@ -63,13 +66,8 @@ public class CellUp : NetworkBehaviour
     public bool hasArrived()
     {
         LoadDataNet ldn = MapOnline.instance.loadData;
-        if (DataGame.ExitRangeGame(nextI, nextJ, ldn.x, ldn.y))
-        {
-            float dist = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].transform.position);
-            return (dist < 0.01f);
-        }
-        else
-            return false;
+        float dist = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].transform.position);
+        return (dist < 0.01f);
     }
     public void MoveNext(Vector2 velocity)
     {
@@ -126,7 +124,7 @@ public class CellUp : NetworkBehaviour
         LoadDataNet ldn = MapOnline.instance.loadData;
         if (hasArrived() && DataGame.ExitRangeGame(nextI, nextJ, ldn.x, ldn.y))
         {
-            if (MapOnline.instance.mapCells[nextI, nextJ].upCell != null)
+            if (MapOnline.instance.mapCells[nextI, nextJ].upCell != null && !MapOnline.instance.mapCells[nextI, nextJ].upCell.player)
             {
                 return (MapOnline.instance.mapCells[nextI, nextJ].upCell.isAbc() &&
                     !MapOnline.instance.mapCells[nextI, nextJ].connectProcess);
@@ -147,7 +145,7 @@ public class CellUp : NetworkBehaviour
     }
     public bool ExitABC()
     {
-        return (iPos == 0 || jPos == 0 || iPos == MapOnline.instance.loadData.x || jPos == MapOnline.instance.loadData.y);
+        return (iPos == 0 || jPos == 0 || iPos == MapOnline.instance.loadData.x-1 || jPos == MapOnline.instance.loadData.y-1);
     }
     private void Update()
     {

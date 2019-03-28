@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
+[NetworkSettings(channel = 0, sendInterval = 0)]
 public class CellGameOnline : NetworkBehaviour
 {
     public CellUp upCell;
@@ -17,13 +17,22 @@ public class CellGameOnline : NetworkBehaviour
     [ClientRpc]
     public void RpcOccup(NetworkInstanceId objId)
     {
-        GameObject cell;
-        if (isClient)
-            cell = ClientScene.FindLocalObject(objId);
-        else
-            cell = NetworkServer.FindLocalObject(objId);
-        upCell = cell.GetComponent<CellUp>();
-        GetComponent<Image>().color = Color.gray;
+        try
+        {
+            GameObject cell;
+            if (isClient)
+                cell = ClientScene.FindLocalObject(objId);
+            else
+                cell = NetworkServer.FindLocalObject(objId);
+            if (!cell.GetComponent<CellUp>().destroy)
+            {
+                upCell = cell.GetComponent<CellUp>();
+                GetComponent<Image>().color = Color.gray;
+            }
+        }catch
+        {
+            Debug.Log("errorOcuup");
+        }
     }
     [ClientRpc]
     public void RpcLeave()
