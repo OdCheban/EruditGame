@@ -202,7 +202,7 @@ public class PlayerOnline : CellUp
     {
         if (playerHead.ExitABC())
             foreach (string resultWords in MapOnline.instance.abcList)
-                if (resultWords == WordPlayer())
+                if (resultWords == WordPlayer() && resultWords != "")
                 {
                     for (int j = 1; j < playerCells.Count; j++)
                     {
@@ -239,7 +239,8 @@ public class PlayerOnline : CellUp
     }
     void Controll()
     {
-        if (Input.GetKeyDown(DataGame.key[0]) || Input.GetKeyDown(DataGame.key[1]) || Input.GetKeyDown(DataGame.key[2]) || Input.GetKeyDown(DataGame.key[3]))
+        if ((Input.GetKeyDown(DataGame.key[0]) || Input.GetKeyDown(DataGame.key[1]) || Input.GetKeyDown(DataGame.key[2]) || Input.GetKeyDown(DataGame.key[3]))
+            && (playerHead.checkBtn()))
         {
             if (Input.GetKeyDown(DataGame.key[1]))
             {

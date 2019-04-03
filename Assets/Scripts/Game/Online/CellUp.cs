@@ -65,10 +65,17 @@ public class CellUp : NetworkBehaviour
 
     public bool hasArrived()
     {
-        LoadDataNet ldn = MapOnline.instance.loadData;
         float dist = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].transform.position);
         return (dist < 0.01f);
     }
+
+    public bool checkBtn()
+    {
+        float dist1 = Vector2.Distance(MapOnline.instance.mapCells[0, 0].transform.position,MapOnline.instance.mapCells[0,1].transform.position);
+        float dist2 = Vector2.Distance(position, MapOnline.instance.mapCells[iTarget, jTarget].transform.position);
+        return (dist2 < dist1 / 2 && (dist2 > dist1/5 || dist2 == 0));
+    }
+
     public void MoveNext(Vector2 velocity)
     {
         PlayerOnline.instance.CmdNext(gameObject, iTarget + (int)velocity.x, jTarget + (int)velocity.y);
