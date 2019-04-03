@@ -107,13 +107,13 @@ public class CellUp : NetworkBehaviour
     public void FollowMe(int iTo, int jTo)
     {
         PlayerOnline.instance.CmdPos(gameObject, iTarget, jTarget);
-        PlayerOnline.instance.CmdTarget(gameObject, iTo, jTo);
-        PlayerOnline.instance.CmdOccupTo(gameObject.GetComponent<NetworkIdentity>().netId, iTo, jTo);
         CellUp prev = PlayerOnline.instance.getPrev(this);
         if (prev != null)
         {
             prev.FollowMe(iTarget, jTarget);
         }
+        PlayerOnline.instance.CmdTarget(gameObject, iTo, jTo);
+        PlayerOnline.instance.CmdOccupTo(gameObject.GetComponent<NetworkIdentity>().netId, iTo, jTo);
     }
     public CellUp Connect(Vector2 velocity)
     {

@@ -164,7 +164,7 @@ public class MapOnline : NetworkBehaviour
         for (int i = 0; i < loadData.x; i++)
             for (int j = 0; j < loadData.y; j++)
             {
-                mapCells[i, j].transform.position = offset + new Vector2((i + 0.5f) * (size + 0.2f), -(j + 0.5f) * (size + 0.2f));
+                mapCells[i, j].transform.position = offset + new Vector2((i + 0.5f) * (size + .05f), -(j + 0.5f) * (size + .05f));
                 if (mapCells[i, j].upCell != null)
                     mapCells[i, j].upCell.transform.position = mapCells[i, j].transform.position;
             }
