@@ -66,16 +66,30 @@ public class PlayerOnline : CellUp
     [Command]
     public void CmdNext(GameObject target, int i, int j)
     {
-        CellUp cellUp = target.GetComponent<CellUp>();
-        cellUp.nextI = i;
-        cellUp.nextJ = j;
+        try
+        {
+            CellUp cellUp = target.GetComponent<CellUp>();
+            cellUp.nextI = i;
+            cellUp.nextJ = j;
+        }
+        catch
+        {
+
+        }
     }
     [Command]
     public void CmdPos(GameObject target, int ii, int jj)
     {
-        CellUp cellTarget = target.GetComponent<CellUp>();
-        cellTarget.iPos = ii;
-        cellTarget.jPos = jj;
+        try
+        {
+            CellUp cellTarget = target.GetComponent<CellUp>();
+            cellTarget.iPos = ii;
+            cellTarget.jPos = jj;
+        }
+        catch
+        {
+
+        }
     }
     [Command]
     public void CmdTarget(GameObject target, int i, int j)
@@ -126,6 +140,7 @@ public class PlayerOnline : CellUp
     {
         arrow.transform.SetParent(playerHead.gameObject.transform);
         arrow.transform.localPosition = Vector3.zero;
+        arrow.transform.SetAsLastSibling();
     }
     [ClientRpc]
     public void RpcColorChange()

@@ -44,6 +44,11 @@ public class CellUp : NetworkBehaviour
         jPos = jTarget;
         destroy = true;
         MapOnline.instance.mapCells[iPos, jPos].RpcLeave();
+        if (transform.Find("Arrow"))
+        {
+            Debug.Log("yes!!");
+            transform.Find("Arrow").SetParent(null);
+        }
         NetworkServer.Destroy(gameObject);
     }
     public Vector2 position

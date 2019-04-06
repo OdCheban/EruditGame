@@ -2731,7 +2731,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "1/4 \u041A\u043E\u043C\u043D\u0430\u0442\u0430 \"\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435\""
+  m_Text: "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430..."
 --- !u!222 &1709148511
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3550,6 +3550,7 @@ MonoBehaviour:
   contentRoom: {fileID: 789923573}
   listRoom: []
   debugInfo: {fileID: 1514354676}
+  timerConnect: 0
 --- !u!4 &1967993816
 Transform:
   m_ObjectHideFlags: 0
